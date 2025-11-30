@@ -1,0 +1,52 @@
+.notification-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  box-shadow: 0 2px 8px rgba(114, 105, 239, 0.06);
+  cursor: pointer;
+  &.unread {
+    border-color: #6159cb;
+  }
+  &:not(:first-child) {
+    margin-top: 1rem;
+  }
+  .btn-accept,
+  .btn-decline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    width: 30px;
+    height: 30px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-accept {
+    background: #7269ef;
+    color: #fff;
+    border: none;
+
+    &:hover {
+      background: #6159cb;
+    }
+  }
+
+  .btn-decline {
+    background: #f5f7fb;
+    color: #7269ef;
+    border: 1px solid #7269ef;
+
+    &:hover {
+      background: #e3e1fc;
+      color: #6159cb;
+      border-color: #6159cb;
+    }
+  }
+}

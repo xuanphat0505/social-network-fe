@@ -1,0 +1,99 @@
+{
+  "profileHeader": "my profile",
+  "profileStatus": "active",
+  "profileDesc": "If several languages coalesce, the grammar of the resulting language is more simple and regular than that of the individual.",
+  "profileLabel": {
+    "notification": "Notification",
+    "about": "About",
+    "file": "Attached Files"
+  },
+  "userInfoLabel": {
+    "header": "Personal Info",
+    "name": "Name",
+    "email": "Email",
+    "time": "Time",
+    "location": "Location"
+  },
+  "chatHeader": "Chats",
+  "chatInputPlaceholder": "Search users",
+  "chatRecent": "Recent",
+  "chatTyping": "typing",
+
+  "groupHeader": "Groups",
+  "groupInputPlaceholder": "Search groups",
+
+  "contactHeader": "Contacts",
+  "contactInputPlaceholder": "Search users",
+
+  "noMessages": "You don’t have any messages",
+  "noContacts": "You don’t have any contacts",
+  "addContact": "Add contact",
+  "chat": "Chat",
+  "share": "Share",
+  "unblockConfirmTitle": "Unblock this user?",
+  "blockConfirmTitle": "Block this user?",
+  "unblockConfirmDesc": "They will be able to send you messages again.",
+  "blockConfirmDesc": "They will not be able to send you messages anymore.",
+  "yes": "Yes",
+  "no": "No",
+  "unblock": "Unblock",
+  "block": "Block",
+  "remove": "Remove",
+
+  "settingHeader": "Settings",
+
+  "settingStatus": {
+    "available": "available",
+    "busy": "busy",
+    "invisible": "invisible",
+    "offline": "offline"
+  },
+  "settingPrivacy": {
+    "privacyHeader": "Privacy",
+    "photo": "Profile photo",
+    "seen": "Last seen",
+    "status": "Status",
+    "receipts": "Read receipts",
+    "groups": "Groups"
+  },
+  "settingSecurity": {
+    "securityHeader": "Security",
+    "notification": "Show security notification",
+    "twoFAHeader": "Two-Factor Authentication (2FA)",
+    "twoFADesc": "Add an extra layer of security at sign in.",
+    "deviceVerificationHeader": "Device Verification",
+    "deviceVerificationDesc": "Require approval for new device logins.",
+    "loginAlertsHeader": "Login Alerts",
+    "loginAlertsDesc": "Get notified when your account is accessed."
+  },
+  "settingHelp": {
+    "helpHeader": "Help",
+    "faq": "FAQS",
+    "contact": "Contact",
+    "policy": "Terms & Privacy policy"
+  },
+  "logout": "Log out",
+  "resetPassword": "Reset password",
+  "chatOption": {
+    "search": "Search",
+    "searchPlaceholder": "Search...",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "block": "Block",
+    "unblock": "Unblock",
+    "delete": "Delete",
+    "audioCall": "Audio",
+    "videoCall": "Video",
+    "viewProfile": "View Profile",
+    "resultsFound": "results",
+    "noMessagesFound": "No messages found",
+    "blockConfirmTitle": "Block this user?",
+    "blockConfirmDesc": "They will not be able to send you messages anymore.",
+    "unblockConfirmTitle": "Unblock this user?",
+    "unblockConfirmDesc": "They will be able to send you messages again.",
+    "deleteConfirmTitle": "Delete entire conversation?",
+    "deleteConfirmDesc": "This will permanently remove all messages between you and this user.",
+    "confirmYes": "Yes",
+    "confirmNo": "No"
+  }
+}

@@ -1,0 +1,55 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  theme: {
+    extend: {
+      colors: {
+        "body-color": "var(--body-color)",
+        "body-bg-color": "var(--body-bg-color)",
+        "sidebar-menu-item-active": "var(--sidebar-menu-item-active)",
+        "sidebar-bg": "var(--sidebar-bg)",
+        "border-color": "var(--border-color)",
+        "sidebar-sub-bg": "var(--bs-sidebar-sub-bg)",
+        "heading-color": "var(--heading-color)",
+        "more-btn-color": "var(--secondary-color)",
+        "secondary-color": "var(--secondary-color)",
+        "success-color": "rgba(6,214,160,1)",
+        "danger-color": "rgba(239,71,111,1)",
+        "warning-color": "rgba(255,186,8,1)",
+        "muted-color": "rgba(156,163,175,1)",
+        "invisible-color": "rgba(107,114,128,0.5)",
+        "offline-color": "rgba(107, 114, 128, 1) ",
+        "card-bg-color": "var(--card-bg-color)",
+        "card-bg-color-2": "var(--card-bg-color-2)",
+        "file-bg-color": "var(--file-bg-color)",
+        "input-bg-color": "var(--input-bg-color)",
+        "group-memeber-header-bg-color": "var(--group-memeber-header-bg-color)",
+        "form-btn-color": "var(--form-btn-color)",
+        "hover-dropdown-btn-bg-color": "var(--hover-dropdown-btn-bg-color)",
+        "highlight-bg-color":"var(--highlight-bg-color)",
+        "notification-bg": "var(--notification-bg)",
+        "notification-hover-bg": "var(--notification-hover-bg)",
+        "notification-read-bg": "var(--notification-read-bg)",
+        "notification-accept": "var(--notification-accept)",
+        "notification-accept-bg": "var(--notification-accept-bg)",
+        "notification-accept-bg-hover": "var(--notification-accept-bg-hover)",
+        "notification-denied": "var(--notification-denied)",
+        "notification-denied-bg": "var(--notification-denied-bg)",
+        "notification-denied-bg-hover": "var(--notification-denied-bg-hover)",
+      },
+      fontSize: {
+        "body-font-size": "15px",
+      },
+      fontWeight: {
+        "body-font-weight": "400",
+      },
+      lineHeight: {
+        "body-line-height": "1.5",
+      },
+      fontFamily: {
+        "body-font-family": ["Public Sans", "sans-serif"],
+      },
+    },
+  },
+  plugins: [],
+};
