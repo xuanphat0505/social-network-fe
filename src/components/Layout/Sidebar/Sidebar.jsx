@@ -17,7 +17,6 @@ import { toast } from "react-toastify";
 import { sidebarIcons, languages } from "../../../assets/data/index";
 import { NavLinkContext } from "../../../context/NavLinkContext";
 import { ThemeContext } from "../../../context/ThemeContext";
-import { SocketContext } from "../../../context/SocketContext";
 import {
   logoutStart,
   logoutSuccess,
@@ -99,7 +98,7 @@ function Sidebar({ isFirstLogin }) {
         },
       },
       {
-        element: ".list-tab_1 .nav-item:nth-child(4)",
+        element: ".list-tab_1 .nav-item:nth-child(3)",
         popover: {
           title: "Contacts",
           description: "See your contacts and add new friends.",
@@ -107,7 +106,7 @@ function Sidebar({ isFirstLogin }) {
         },
       },
       {
-        element: ".list-tab_1 .nav-item:nth-child(5)",
+        element: ".list-tab_1 .nav-item:nth-child(4)",
         popover: {
           title: "Settings",
           description: "Change your preferences, privacy, and app settings.",

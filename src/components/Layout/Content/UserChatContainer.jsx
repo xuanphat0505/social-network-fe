@@ -6,8 +6,11 @@ import {
   RiDeleteBinLine,
   RiFileCopyLine,
   RiSaveLine,
+  RiChatSmile2Line,
 } from "react-icons/ri";
 import { useTranslation } from "react-i18next";
+import Lottie from "lottie-react";
+import emptyChat from "../../../assets/lottie/empty-chat.json";
 
 import { OpenContext } from "../../../context/OpenContext";
 import { AxiosContext } from "../../../context/AxiosContext";
@@ -129,7 +132,9 @@ function UserChatContainer() {
     </>
   ) : (
     <div className="user-chat-container flex items-center justify-center">
-      <p>Don't have any chat</p>
+      <div className="w-[300px] h-auto">
+        <Lottie animationData={emptyChat} loop={true} />
+      </div>
     </div>
   );
 }

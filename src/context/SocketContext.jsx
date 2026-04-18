@@ -1,14 +1,14 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { createContext, useEffect, useRef, useState, useContext } from 'react';
-import { io } from 'socket.io-client';
+import { useDispatch, useSelector } from "react-redux";
+import { createContext, useEffect, useRef, useState, useContext } from "react";
+import { io } from "socket.io-client";
 
-import { SOCKET_URL } from '../config/utils';
-import { loginSuccess } from '../redux/authSlice';
-import { AxiosContext } from './AxiosContext';
-import { toast } from 'react-toastify';
-import { OpenContext } from './OpenContext';
-import ringTone from '../assets/sounds/facebook_call.mp3';
-import messageSound from '../assets/sounds/facebook_message.mp3';
+import { SOCKET_URL } from "../config/utils";
+import { loginSuccess } from "../redux/authSlice";
+import { AxiosContext } from "./AxiosContext";
+import { toast } from "react-toastify";
+import { OpenContext } from "./OpenContext";
+import ringTone from "../assets/sounds/facebook_call.mp3";
+import messageSound from "../assets/sounds/facebook_message.mp3";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const SocketContext = createContext();
@@ -32,14 +32,16 @@ function SocketProvider({ children }) {
     handleGetReceiver,
     handleGetMessage,
   } = useContext(AxiosContext);
-  const { setOpenAudioCallModal, setOpenVideoCallModal } = useContext(OpenContext);
+  const { setOpenAudioCallModal, setOpenVideoCallModal } =
+    useContext(OpenContext);
 
   const [incomingCall, setIncomingCall] = useState(null);
-  const [callState, setCallState] = useState('idle');
+  const [callState, setCallState] = useState("idle");
   const [callDuration, setCallDuration] = useState(0);
-  const [partnerId, setPartnerId] = useState('');
+  const [partnerId, setPartnerId] = useState("");
   const [blockedBy, setBlockedBy] = useState({});
   const [currentCallIsVideo, setCurrentCallIsVideo] = useState(false);
+  const [broadcastMessage, setBroadcastMessage] = useState(null);
 
   // ref for calls
   const peerRef = useRef(null);
@@ -52,7 +54,7 @@ function SocketProvider({ children }) {
   const callTimeoutRef = useRef(null);
 
   const handleAddedContact = (notification) => {
-    console.log('📨 New friend request:', notification);
+    console.log("📨 New friend request:", notification);
 
     setNotifications((prev) => [...prev, notification]);
 
@@ -61,39 +63,37 @@ function SocketProvider({ children }) {
       loginSuccess({
         ...user,
         notifications: [...(user?.notifications || []), notification._id],
-      })
+      }),
     );
   };
 
- 
-
   const handleSendMessage = (message) => {
-    console.log('📨 New message received:', message);
-    console.log('📨 Current user ID:', user?._id);
-    console.log('📨 Message sender ID:', message?.senderId?._id);
+    console.log("📨 New message received:", message);
+    console.log("📨 Current user ID:", user?._id);
+    console.log("📨 Message sender ID:", message?.senderId?._id);
 
     // Phát âm thanh khi nhận tin nhắn mới (chỉ khi không phải tin nhắn của chính mình)
     if (message?.senderId?._id !== user?._id) {
       // Kiểm tra danh sách user bị mute (localStorage)
       let muted = [];
       try {
-        const raw = localStorage.getItem('muted_users');
+        const raw = localStorage.getItem("muted_users");
         muted = raw ? JSON.parse(raw) : [];
       } catch (error) {
         muted = [];
       }
-      const senderId = String(message?.senderId?._id || '');
+      const senderId = String(message?.senderId?._id || "");
       const isMuted = muted.includes(senderId);
       if (!isMuted) {
         try {
           if (messageAudioRef.current) {
             messageAudioRef.current.currentTime = 0; // Reset về đầu file
             messageAudioRef.current.play().catch((error) => {
-              console.log('Không thể phát âm thanh tin nhắn:', error);
+              console.log("Không thể phát âm thanh tin nhắn:", error);
             });
           }
         } catch (error) {
-          console.log('Lỗi phát âm thanh tin nhắn:', error);
+          console.log("Lỗi phát âm thanh tin nhắn:", error);
         }
       }
 
@@ -102,7 +102,9 @@ function SocketProvider({ children }) {
         const senderId = message?.senderId?._id;
         const existingChatIndex = prev.findIndex((chat) => {
           const partnerId =
-            chat.senderId._id === user?._id ? chat.receiverId._id : chat.senderId._id;
+            chat.senderId._id === user?._id
+              ? chat.receiverId._id
+              : chat.senderId._id;
           return String(partnerId) === String(senderId);
         });
 
@@ -148,8 +150,10 @@ function SocketProvider({ children }) {
     // Check both direct receiver structure and nested receiver structure
     const isCurrentChat =
       receiver &&
-      (String(receiver._id || receiver?.receiver?._id) === String(message?.senderId?._id) ||
-        String(receiver._id || receiver?.receiver?._id) === String(message?.receiverId?._id));
+      (String(receiver._id || receiver?.receiver?._id) ===
+        String(message?.senderId?._id) ||
+        String(receiver._id || receiver?.receiver?._id) ===
+          String(message?.receiverId?._id));
 
     if (isMessageForCurrentUser && isCurrentChat) {
       setMessages((prev) => {
@@ -184,11 +188,13 @@ function SocketProvider({ children }) {
   };
 
   const handleReactMessage = (data) => {
-    console.log('data', data);
+    console.log("data", data);
 
     const { messageId, emoji } = data;
 
-    setMessages((prev) => prev.map((msg) => (msg._id === messageId ? { ...msg, emoji } : msg)));
+    setMessages((prev) =>
+      prev.map((msg) => (msg._id === messageId ? { ...msg, emoji } : msg)),
+    );
   };
 
   const handleChangeStatus = ({ userId, status }) => {
@@ -209,7 +215,8 @@ function SocketProvider({ children }) {
     // Cập nhật status trong chatList
     setChatList((prev) =>
       prev.map((chat) => {
-        const partner = chat.senderId._id === user?._id ? chat.receiverId : chat.senderId;
+        const partner =
+          chat.senderId._id === user?._id ? chat.receiverId : chat.senderId;
         return String(partner._id) === String(userId)
           ? {
               ...chat,
@@ -223,14 +230,14 @@ function SocketProvider({ children }) {
                   : chat.receiverId,
             }
           : chat;
-      })
+      }),
     );
   };
 
   const handleUpdateChatList = ({ partnerId, lastMessage, unreadCount }) => {
     setChatList((prev) => {
       const idx = prev.findIndex(
-        (c) => c.senderId._id === partnerId || c.receiverId._id === partnerId
+        (c) => c.senderId._id === partnerId || c.receiverId._id === partnerId,
       );
 
       if (idx !== -1) {
@@ -257,7 +264,9 @@ function SocketProvider({ children }) {
     setChatList((prev) => {
       return prev.map((chat) => {
         const partnerId =
-          chat.senderId._id === message?.senderId?._id ? chat.senderId._id : chat.receiverId._id;
+          chat.senderId._id === message?.senderId?._id
+            ? chat.senderId._id
+            : chat.receiverId._id;
 
         // Nếu partner trùng với sender trong sự kiện readMessage → reset unreadCount về 0
         if (partnerId === message?.senderId?._id) {
@@ -273,14 +282,18 @@ function SocketProvider({ children }) {
 
   const handleRevokeMessage = ({ messageId, isRevoked }) => {
     setMessages((prevMessages) =>
-      prevMessages.map((msg) => (msg._id === messageId ? { ...msg, isRevoked } : msg))
+      prevMessages.map((msg) =>
+        msg._id === messageId ? { ...msg, isRevoked } : msg,
+      ),
     );
   };
 
   const handlePinnedMessage = (data) => {
-    console.log('pin message', data);
+    console.log("pin message", data);
     setMessages((prev) =>
-      prev.map((msg) => (msg._id === data._id ? { ...msg, isPinned: data.isPinned } : msg))
+      prev.map((msg) =>
+        msg._id === data._id ? { ...msg, isPinned: data.isPinned } : msg,
+      ),
     );
   };
 
@@ -288,11 +301,11 @@ function SocketProvider({ children }) {
   const startCall = async ({ _id, username, avatar }, isVideo = true) => {
     try {
       if (peerRef.current) {
-        console.warn('⚠️ Peer đã tồn tại, không tạo mới');
+        console.warn("⚠️ Peer đã tồn tại, không tạo mới");
         return;
       }
 
-      setCallState('outgoing');
+      setCallState("outgoing");
       setPartnerId(_id);
       setCurrentCallIsVideo(isVideo);
 
@@ -303,7 +316,7 @@ function SocketProvider({ children }) {
         setOpenAudioCallModal({ _id, username, avatar });
       }
 
-      console.log('📞 [startCall] Bắt đầu gọi...', { _id, isVideo });
+      console.log("📞 [startCall] Bắt đầu gọi...", { _id, isVideo });
 
       const stream = await navigator.mediaDevices.getUserMedia({
         video: isVideo,
@@ -315,7 +328,7 @@ function SocketProvider({ children }) {
       }
 
       const peer = new RTCPeerConnection({
-        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
       });
       peerRef.current = peer;
 
@@ -326,7 +339,7 @@ function SocketProvider({ children }) {
 
       peer.onicecandidate = (event) => {
         if (event.candidate) {
-          socket.current.emit('iceCandidate', {
+          socket.current.emit("iceCandidate", {
             to: _id,
             candidate: event.candidate,
           });
@@ -343,17 +356,17 @@ function SocketProvider({ children }) {
       await peer.setLocalDescription(offer);
       const start = Date.now();
 
-      socket.current.emit('callUser', {
+      socket.current.emit("callUser", {
         to: _id,
         from: { _id: user._id, username: user.username, avatar: user.avatar },
         signalData: offer,
-        type: 'offer',
+        type: "offer",
         isVideo,
         start,
       });
       // ⏱ Timeout check missed call
       callTimeoutRef.current = setTimeout(() => {
-        socket.current.emit('missedCall', {
+        socket.current.emit("missedCall", {
           to: _id,
           from: { _id: user._id, username: user.username, avatar: user.avatar },
           isVideo,
@@ -362,21 +375,21 @@ function SocketProvider({ children }) {
       }, 10000);
 
       setCallDuration(0);
-      console.log('📡 Offer gửi tới partner:', _id);
+      console.log("📡 Offer gửi tới partner:", _id);
     } catch (error) {
-      console.error('❌ startCall error:', error);
-      toast.error('❌ startCall error: ' + error.message);
+      console.error("❌ startCall error:", error);
+      toast.error("❌ startCall error: " + error.message);
     }
   };
 
   // Khi có cuộc gọi đến → chỉ lưu state, chưa trả lời ngay
   const handleReceiveCall = ({ from, signalData, isVideo, start }) => {
     if (peerRef.current) {
-      console.warn('⚠️ Đang trong cuộc gọi, không nhận thêm');
+      console.warn("⚠️ Đang trong cuộc gọi, không nhận thêm");
       return;
     }
     setIncomingCall({ from, signalData, isVideo, start });
-    setCallState('incoming');
+    setCallState("incoming");
     setPartnerId(from._id);
     setCurrentCallIsVideo(isVideo);
 
@@ -395,9 +408,11 @@ function SocketProvider({ children }) {
     }
 
     if (peerRef.current) {
-      await peerRef.current.setRemoteDescription(new RTCSessionDescription(signalData));
+      await peerRef.current.setRemoteDescription(
+        new RTCSessionDescription(signalData),
+      );
     }
-    setCallState('inCall');
+    setCallState("inCall");
     setCallDuration(0);
   };
 
@@ -407,7 +422,7 @@ function SocketProvider({ children }) {
         await peerRef.current.addIceCandidate(new RTCIceCandidate(candidate));
       }
     } catch (error) {
-      return toast.error('❌ Error adding ICE candidate:', error);
+      return toast.error("❌ Error adding ICE candidate:", error);
     }
   };
 
@@ -429,7 +444,7 @@ function SocketProvider({ children }) {
       }
 
       const peer = new RTCPeerConnection({
-        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
       });
       peerRef.current = peer;
 
@@ -439,7 +454,7 @@ function SocketProvider({ children }) {
 
       peer.onicecandidate = (event) => {
         if (event.candidate) {
-          socket.current.emit('iceCandidate', {
+          socket.current.emit("iceCandidate", {
             to: from,
             candidate: event.candidate,
           });
@@ -456,13 +471,13 @@ function SocketProvider({ children }) {
       const answer = await peer.createAnswer();
       await peer.setLocalDescription(answer);
 
-      socket.current.emit('answerCall', {
+      socket.current.emit("answerCall", {
         to: from._id,
         signalData: answer,
-        type: 'answer',
+        type: "answer",
       });
       setIncomingCall(null);
-      setCallState('inCall');
+      setCallState("inCall");
       if (start) {
         const elapsed = Math.floor((Date.now() - start) / 1000);
         setCallDuration(elapsed);
@@ -470,17 +485,17 @@ function SocketProvider({ children }) {
         setCallDuration(0);
       }
     } catch (error) {
-      console.error('❌ acceptCall error:', error);
-      toast.error('❌ acceptCall error: ' + error.message);
+      console.error("❌ acceptCall error:", error);
+      toast.error("❌ acceptCall error: " + error.message);
     }
   };
 
   const endCall = () => {
     const otherId = incomingCall ? incomingCall.from._id : partnerId; // id người kia khi đang in/outgoing
 
-    if (otherId && callState === 'inCall') {
+    if (otherId && callState === "inCall") {
       // Chỉ lưu cuộc gọi nếu đã kết nối thành công
-      socket.current.emit('endCall', {
+      socket.current.emit("endCall", {
         to: otherId,
         from: { _id: user._id, username: user.username, avatar: user.avatar },
         duration: callDuration,
@@ -488,7 +503,7 @@ function SocketProvider({ children }) {
       });
     } else if (otherId) {
       // Nếu chưa kết nối thì chỉ emit endCall đơn giản
-      socket.current.emit('endCall', { to: otherId });
+      socket.current.emit("endCall", { to: otherId });
     }
 
     // Dọn peer & stream
@@ -504,14 +519,14 @@ function SocketProvider({ children }) {
     setOpenAudioCallModal(null);
     setOpenVideoCallModal(null);
     setIncomingCall(null);
-    setCallState('idle');
+    setCallState("idle");
     setCallDuration(0);
     setCurrentCallIsVideo(false);
   };
 
   useEffect(() => {
     let interval;
-    if (callState === 'inCall') {
+    if (callState === "inCall") {
       interval = setInterval(() => setCallDuration((prev) => prev + 1), 1000);
     }
     return () => clearInterval(interval);
@@ -522,72 +537,73 @@ function SocketProvider({ children }) {
 
     socket.current = io(SOCKET_URL, {
       withCredentials: true,
-      transports: ['websocket'],
+      transports: ["websocket"],
     });
 
-    socket.current.on('connect', () => {
-      console.log('✅ Socket connected successfully');
-      console.log('🔗 Joining room for user:', user._id);
-      socket.current.emit('join', user._id); // Join room theo userId
-      dispatch(loginSuccess({ ...user, status: 'available' }));
+    socket.current.on("connect", () => {
+      console.log("✅ Socket connected successfully");
+      console.log("🔗 Joining room for user:", user._id);
+      socket.current.emit("join", user._id); // Join room theo userId
+      dispatch(loginSuccess({ ...user, status: "available" }));
     });
 
     // contact socket
-    socket.current.on('addedContact', handleAddedContact);
-    socket.current.on('contactAccepted', () => {
+    socket.current.on("addedContact", handleAddedContact);
+    socket.current.on("contactAccepted", () => {
       handleGetContacts();
     });
-    socket.current.on('contactDeleted', () => {
+    socket.current.on("contactDeleted", () => {
       handleGetContacts();
     });
     // -------- //
 
-
     // message socket //
-    socket.current.on('sendMessage', (data) => {
-      console.log('🎧 Received sendMessage event:', data);
+    socket.current.on("sendMessage", (data) => {
+      console.log("🎧 Received sendMessage event:", data);
       handleSendMessage(data);
     });
-    socket.current.on('reactMessage', handleReactMessage);
-    socket.current.on('typing', ({ senderId }) => {
+    socket.current.on("reactMessage", handleReactMessage);
+    socket.current.on("typing", ({ senderId }) => {
       setTypingUserId(senderId);
     });
-    socket.current.on('stopTyping', ({ senderId }) => {
-      console.log('sender:', senderId);
+    socket.current.on("stopTyping", ({ senderId }) => {
+      console.log("sender:", senderId);
       setTypingUserId(null);
     });
-    socket.current.on('unreadMessage', ({ message }) => {
-      console.log('message:', message);
+    socket.current.on("unreadMessage", ({ message }) => {
+      console.log("message:", message);
       setUnreadMessages((prev) => [...prev, message]);
     });
-    socket.current.on('readMessage', handleReadMessage);
-    socket.current.on('revokeMessage', handleRevokeMessage);
-    socket.current.on('pinnedMessage', handlePinnedMessage);
+    socket.current.on("readMessage", handleReadMessage);
+    socket.current.on("revokeMessage", handleRevokeMessage);
+    socket.current.on("pinnedMessage", handlePinnedMessage);
 
     // -------- //
 
     // user socket //
-    socket.current.on('changeStatus', handleChangeStatus);
-    socket.current.on('updateChatList', handleUpdateChatList);
-    socket.current.on('friendOnline', (friend) => {
+    socket.current.on("changeStatus", handleChangeStatus);
+    socket.current.on("updateChatList", handleUpdateChatList);
+    socket.current.on("friendOnline", (friend) => {
       setFriendList((prev) => {
         const exists = prev.some((f) => f._id === friend._id);
         if (exists) {
-          return friend.status === 'available'
-            ? prev.map((f) => (f._id === friend._id ? { ...f, status: friend.status } : f))
+          return friend.status === "available"
+            ? prev.map((f) =>
+                f._id === friend._id ? { ...f, status: friend.status } : f,
+              )
             : prev.filter((f) => f._id !== friend._id);
         }
-        return friend.status === 'available' ? [...prev, friend] : prev;
+        return friend.status === "available" ? [...prev, friend] : prev;
       });
     });
 
-    socket.current.on('blockedByUser', ({ userId }) => {
-      console.log('🚫 Bạn đã bị block bởi:', userId);
+    socket.current.on("blockedByUser", ({ userId }) => {
+      console.log("🚫 Bạn đã bị block bởi:", userId);
       setBlockedBy((prev) => ({ ...prev, [userId]: true }));
     });
 
-    socket.current.on('unblockedByUser', ({ userId }) => {
-      console.log('🔓 Bạn đã được unblock bởi:', userId);
+    socket.current.on("unblockedByUser", ({ userId }) => {
+      console.log("🔓 Bạn đã được unblock bởi:", userId);
       setBlockedBy((prev) => {
         const updated = { ...prev };
         delete updated[userId];
@@ -596,18 +612,25 @@ function SocketProvider({ children }) {
     });
     // -------- //
 
+    // broadcast from admin
+    socket.current.on("broadcastNotification", (data) => {
+      console.log("📢 Broadcast received:", data);
+      setBroadcastMessage(data);
+    });
+    // -------- //
+
     //======= CALL EVENTS ====== //
-    socket.current.on('callUser', handleReceiveCall);
-    socket.current.on('answerCall', handleAnswer);
-    socket.current.on('iceCandidate', handleNewICE);
-    socket.current.on('missedCall', () => {
+    socket.current.on("callUser", handleReceiveCall);
+    socket.current.on("answerCall", handleAnswer);
+    socket.current.on("iceCandidate", handleNewICE);
+    socket.current.on("missedCall", () => {
       // Show thông báo "cuộc gọi nhỡ"
-      setCallState('idle');
+      setCallState("idle");
       setOpenVideoCallModal(null);
       setOpenAudioCallModal(null);
     });
-    socket.current.on('missedCallNotification', (noti) => {
-      console.log('🔔 Missed call mới:', noti);
+    socket.current.on("missedCallNotification", (noti) => {
+      console.log("🔔 Missed call mới:", noti);
       // Ví dụ: push vào state notifications
       setNotifications((prev) => [noti, ...prev]);
       dispatch(
@@ -617,46 +640,49 @@ function SocketProvider({ children }) {
             ...(user?.notifications || []),
             noti._id, // chỉ push ID
           ],
-        })
+        }),
       );
     });
 
-    socket.current.on('callEnded', () => {
+    socket.current.on("callEnded", () => {
       endCall();
     });
     //============================//
 
     return () => {
-      socket.current.off('connect');
-      socket.current.off('addedContact');
-      socket.current.off('contactAccepted');
-      socket.current.off('contactDeleted');
-      socket.current.off('sendMessage');
-      socket.current.off('reactMessage');
-      socket.current.off('changeStatus');
-      socket.current.off('typing');
-      socket.current.off('stopTyping');
-      socket.current.off('unreadMessage');
-      socket.current.off('readMessage');
-      socket.current.off('updateChatList');
-      socket.current.off('revokeMessage');
-      socket.current.off('callUser');
-      socket.current.off('answerCall');
-      socket.current.off('iceCandidate');
-      socket.current.off('callEnded');
-      socket.current.off('blockedByUser');
-      socket.current.off('unblockedByUser');
-      socket.current.off('pinnedMessage');
+      socket.current.off("connect");
+      socket.current.off("addedContact");
+      socket.current.off("contactAccepted");
+      socket.current.off("contactDeleted");
+      socket.current.off("sendMessage");
+      socket.current.off("reactMessage");
+      socket.current.off("changeStatus");
+      socket.current.off("typing");
+      socket.current.off("stopTyping");
+      socket.current.off("unreadMessage");
+      socket.current.off("readMessage");
+      socket.current.off("updateChatList");
+      socket.current.off("revokeMessage");
+      socket.current.off("callUser");
+      socket.current.off("answerCall");
+      socket.current.off("iceCandidate");
+      socket.current.off("callEnded");
+      socket.current.off("blockedByUser");
+      socket.current.off("unblockedByUser");
+      socket.current.off("pinnedMessage");
+      socket.current.off("broadcastNotification");
 
       socket.current.disconnect();
     };
   }, [user?._id]); // Reconnect khi user thay đổi
 
   useEffect(() => {
-    if (callState === 'outgoing' || callState === 'incoming') {
+    if (callState === "outgoing" || callState === "incoming") {
       audioRef.current = new Audio(ringTone);
       audioRef.current.loop = true;
-      audioRef.current.play().catch((err) => console.error('Autoplay blocked:', err));
+      audioRef.current
+        .play()
+        .catch((err) => console.error("Autoplay blocked:", err));
     } else {
       if (audioRef.current) {
         audioRef.current.pause();
@@ -686,6 +712,8 @@ function SocketProvider({ children }) {
         startCall,
         endCall,
         acceptCall,
+        broadcastMessage,
+        clearBroadcast: () => setBroadcastMessage(null),
       }}
     >
       {children}

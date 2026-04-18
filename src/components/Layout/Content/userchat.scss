@@ -126,7 +126,7 @@
                   color: #fff;
                   &::before {
                     position: absolute;
-                    content: '';
+                    content: "";
                     bottom: -9px;
                     left: 0;
                     border-bottom: 5px solid #0000;
@@ -150,7 +150,7 @@
                       position: relative;
                       &.overlay {
                         &::before {
-                          content: '';
+                          content: "";
                           position: absolute;
                           top: 0;
                           left: 0;
@@ -256,7 +256,7 @@
           text-align: center;
           &::before {
             position: absolute;
-            content: '';
+            content: "";
             top: 10px;
             left: 0;
             width: 100%;

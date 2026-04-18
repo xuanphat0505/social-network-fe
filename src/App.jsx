@@ -1,17 +1,18 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { useContext } from 'react';
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useContext } from "react";
 
-import { ToastContainer } from 'react-toastify';
-import { ThemeContext } from './context/ThemeContext';
-import { SkeletonTheme } from 'react-loading-skeleton';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import SignIn from './pages/SignIn';
-import ForgetPassword from './pages/ForgetPassword';
-import StartedContainer from './pages/StartedContainer';
-import ResetPassword from './pages/ResetPassword';
-import OTPForm from './pages/OTPForm';
+import { ToastContainer } from "react-toastify";
+import { ThemeContext } from "./context/ThemeContext";
+import { SkeletonTheme } from "react-loading-skeleton";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import SignIn from "./pages/SignIn";
+import ForgetPassword from "./pages/ForgetPassword";
+import StartedContainer from "./pages/StartedContainer";
+import ResetPassword from "./pages/ResetPassword";
+import OTPForm from "./pages/OTPForm";
+import SystemBroadcastBanner from "./components/SystemBroadcastBanner";
 
 function App() {
   const { theme } = useContext(ThemeContext);
@@ -19,12 +20,16 @@ function App() {
 
   return (
     <SkeletonTheme
-      baseColor={theme === 'dark' ? '#3b4252' : '#e6e8eb'}
-      highlightColor={theme === 'dark' ? '#4c566a' : '#f5f7fa'}
+      baseColor={theme === "dark" ? "#3b4252" : "#e6e8eb"}
+      highlightColor={theme === "dark" ? "#4c566a" : "#f5f7fa"}
     >
       <div className="app">
+        <SystemBroadcastBanner />
         <Routes>
-          <Route path="/" element={user ? <Home /> : <Navigate to={'/login'} replace />}></Route>
+          <Route
+            path="/"
+            element={user ? <Home /> : <Navigate to={"/login"} replace />}
+          ></Route>
           <Route path="/login" element={<Login />}></Route>
           <Route path="/register" element={<SignIn />}></Route>
           <Route path="/forget-password" element={<ForgetPassword />}></Route>
