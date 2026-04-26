@@ -2,8 +2,8 @@ import { useContext, useState } from "react";
 import { useSelector } from "react-redux";
 import { RiCloseFill } from "react-icons/ri";
 
-import { OpenContext } from "../../context/OpenContext";
-import { AxiosContext } from "../../context/AxiosContext";
+import { OpenContext } from "@/context/OpenContext";
+import { AxiosContext } from "@/context/AxiosContext";
 
 import "./modal.scss";
 

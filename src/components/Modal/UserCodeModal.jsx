@@ -3,7 +3,7 @@ import { Button } from "antd";
 import { toast } from "react-toastify";
 import { RiCloseFill, RiFileCopyLine } from "react-icons/ri";
 
-import { OpenContext } from "../../context/OpenContext";
+import { OpenContext } from "@/context/OpenContext";
 
 import "./modal.scss";
 function UserCodeModal() {

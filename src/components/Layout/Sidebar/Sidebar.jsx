@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from "react";
+import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -22,11 +23,11 @@ import {
   logoutSuccess,
   logoutFailed,
 } from "../../../redux/authSlice";
-import { BASE_URL } from "../../../config/utils";
-import useAxiosJWT from "../../../config/axiosConfig";
-import logoImg from "../../../assets/images/logo.svg";
-import Loader from "../../../shared/Loader/Loader";
-import { AxiosContext } from "../../../context/AxiosContext";
+import { BASE_URL } from "@/config/utils";
+import useAxiosJWT from "@/config/axiosConfig";
+import logoImg from "@/assets/images/logo.svg";
+import Loader from "@/shared/Loader/Loader";
+import { AxiosContext } from "@/context/AxiosContext";
 
 function Sidebar({ isFirstLogin }) {
   const getAxiosJWT = useAxiosJWT();
@@ -140,13 +141,17 @@ function Sidebar({ isFirstLogin }) {
     ],
   });
 
+  /**
+   * Xử lý đăng xuất người dùng
+   * Sử dụng axios thường thay vì axiosJWT để tránh vòng lặp refresh token khi token đã hết hạn
+   */
   const handleLogout = async () => {
     if (!user?.accessToken) {
       return toast.error("You're not logged in yet");
     }
     dispatch(logoutStart());
     try {
-      const res = await axiosJWT.post(
+      const res = await axios.post(
         `${BASE_URL}/auth/logout`,
         {},
         {
@@ -164,7 +169,15 @@ function Sidebar({ isFirstLogin }) {
         navigate("/login");
       }
     } catch (error) {
-      dispatch(logoutFailed);
+      // Nếu lỗi 401 (không được xác thực) khi logout, tức là session đã hết hạn trên server
+      // Chúng ta vẫn tiến hành logout thành công ở client để xóa state
+      if (error.response?.status === 401) {
+        localStorage.removeItem("hasSeenTour");
+        dispatch(logoutSuccess());
+        navigate("/login");
+        return;
+      }
+      dispatch(logoutFailed());
       return toast.error(error.response?.data?.message);
     }
   };

@@ -7,11 +7,11 @@ import { IoChevronUp, IoChevronDown } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import Tippy from '@tippyjs/react';
 
-import { loginSuccess } from '../../redux/authSlice';
-import { statusOnline } from '../../assets/data';
-import { BASE_URL } from '../../config/utils';
-import { OpenContext } from '../../context/OpenContext';
-import useAxiosJWT from '../../config/axiosConfig';
+import { loginSuccess } from '@/redux/authSlice';
+import { statusOnline } from '@/assets/data';
+import { BASE_URL } from '@/config/utils';
+import { OpenContext } from '@/context/OpenContext';
+import useAxiosJWT from '@/config/axiosConfig';
 import PersonalInfo from './PersonalInfo';
 import Security from './Security';
 import Help from './Help';

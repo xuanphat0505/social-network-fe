@@ -1,10 +1,10 @@
 import { useState, useContext, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { RiCloseFill } from "react-icons/ri";
-import { OpenContext } from "../../context/OpenContext";
-import { AxiosContext } from "../../context/AxiosContext";
+import { OpenContext } from "@/context/OpenContext";
+import { AxiosContext } from "@/context/AxiosContext";
 
-import Loader from "../../shared/Loader/Loader";
+import Loader from "@/shared/Loader/Loader";
 
 import "./modal.scss";
 function RevokeMessageModal() {

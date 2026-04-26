@@ -4,12 +4,12 @@ import { RiCloseFill, RiUploadCloudLine, RiImageLine } from "react-icons/ri";
 import { Button } from "antd";
 import { toast } from "react-toastify";
 
-import { loginSuccess } from "../../redux/authSlice";
-import { OpenContext } from "../../context/OpenContext";
-import { avatarList } from "../../assets/data/index";
-import { BASE_URL } from "../../config/utils";
-import useAxiosJWT from "../../config/axiosConfig";
-import Loader from "../../shared/Loader/Loader";
+import { loginSuccess } from "@/redux/authSlice";
+import { OpenContext } from "@/context/OpenContext";
+import { avatarList } from "@/assets/data/index";
+import { BASE_URL } from "@/config/utils";
+import useAxiosJWT from "@/config/axiosConfig";
+import Loader from "@/shared/Loader/Loader";
 
 import "./modal.scss";
 function AvatarModal() {

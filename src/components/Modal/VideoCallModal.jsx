@@ -1,9 +1,9 @@
 import { useContext } from 'react';
 import { RiCloseFill, RiVidiconFill } from 'react-icons/ri';
-
-import { OpenContext } from '../../context/OpenContext';
-import { SocketContext } from '../../context/SocketContext';
 import ReactPlayer from 'react-player';
+
+import { OpenContext } from '@/context/OpenContext';
+import { SocketContext } from '@/context/SocketContext';
 
 import './modal.scss';
 

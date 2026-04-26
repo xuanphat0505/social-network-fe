@@ -1,4 +1,4 @@
-import "./userchat.scss";
+import "@/components/Layout/Content/userchat.scss";
 function ImagesChat({ images }) {
   return (
     <ul className="message-images">

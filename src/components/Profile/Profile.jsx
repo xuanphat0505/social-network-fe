@@ -5,33 +5,26 @@ import { useTranslation } from 'react-i18next';
 import {
   RiRecordCircleFill,
   RiUser2Line,
-  RiAttachmentLine,
-  RiFileTextFill,
-  RiImageFill,
-  RiDownloadLine,
-  RiDeleteBinLine,
 } from 'react-icons/ri';
 import { LuBellRing } from 'react-icons/lu';
 import { IoChevronUp, IoChevronDown } from 'react-icons/io5';
 import { FiUser, FiMail, FiMapPin, FiHash } from 'react-icons/fi';
-import { toast } from 'react-toastify';
 
-import { loginSuccess } from '../../redux/authSlice';
-import { AxiosContext } from '../../context/AxiosContext';
-import { BASE_URL } from '../../config/utils';
-import { STATUS_COLOR_CLASSES } from '../../config/statusColors';
-import useAxiosJWT from '../../config/axiosConfig';
-import FriendInvite from '../Notifications/FriendInvite';
-import MissedCall from '../Notifications/MissedCall';
-import ResponseRequest from '../Notifications/ResponeRequest';
+import { AxiosContext } from '@/context/AxiosContext';
+import { STATUS_COLOR_CLASSES } from '@/config/statusColors';
+import FriendInvite from '@/components/Notifications/FriendInvite';
+import MissedCall from '@/components/Notifications/MissedCall';
+import ResponseRequest from '@/components/Notifications/ResponeRequest';
 
 import './profile.scss';
 function Profile({ navLink }) {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth?.user);
-  const getAxiosJWT = useAxiosJWT();
-  const axiosJWT = getAxiosJWT();
-  const { notifications } = useContext(AxiosContext);
+  const { 
+    notifications, 
+    handleReadAllNotifications, 
+    handleReadSingleNotification 
+  } = useContext(AxiosContext);
   const { t } = useTranslation();
   const [activeAboutTab, setActiveAboutTab] = useState(false);
   const [activeNotificationTab, setActiveNotificationTab] = useState(false);
@@ -42,64 +35,6 @@ function Profile({ navLink }) {
     response_request: ResponseRequest,
   };
 
-  const handleReadAllNotifications = async () => {
-    try {
-      const res = await axiosJWT.put(
-        `${BASE_URL}/notifications/read`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${user?.accessToken}`,
-          },
-          withCredentials: true,
-        }
-      );
-
-      const result = res.data;
-      if (result.success) {
-        // Cập nhật Redux state
-        dispatch(
-          loginSuccess({
-            ...user,
-            notifications: user.notifications.map((n) => ({
-              ...n,
-              isRead: true,
-            })),
-          })
-        );
-      }
-    } catch (error) {
-      toast.error(error?.response?.data?.message || 'Failed to mark all as read');
-    }
-  };
-
-  const handleReadSingleNotification = async (notificationId) => {
-    try {
-      const res = await axiosJWT.put(
-        `${BASE_URL}/notifications/read/${notificationId}`, // sửa lại URL
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${user?.accessToken}`,
-          },
-          withCredentials: true,
-        }
-      );
-      const result = res.data;
-      if (result.success) {
-        dispatch(
-          loginSuccess({
-            ...user,
-            notifications: user.notifications.map((n) =>
-              n._id === notificationId ? { ...n, isRead: true } : n
-            ),
-          })
-        );
-      }
-    } catch (error) {
-      toast.error(error?.response?.data?.message || 'Failed to read notification');
-    }
-  };
 
   return (
     <div className={`tab-pane ${navLink === 'profile' ? 'active' : ''}`}>

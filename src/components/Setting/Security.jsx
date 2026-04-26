@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next';
 import { IoChevronDown, IoChevronUp } from 'react-icons/io5';
 import { RiShieldCheckLine, RiSmartphoneLine, RiNotificationLine } from 'react-icons/ri';
 import { toast } from 'react-toastify';
-import { BASE_URL } from '../../config/utils';
-import useAxiosJWT from '../../config/axiosConfig';
-import { loginSuccess } from '../../redux/authSlice';
+import { BASE_URL } from '@/config/utils';
+import useAxiosJWT from '@/config/axiosConfig';
+import { loginSuccess } from '@/redux/authSlice';
 
 function Security({ toggleSetting, settingOption, info }) {
   const user = useSelector((state) => state.auth?.user);

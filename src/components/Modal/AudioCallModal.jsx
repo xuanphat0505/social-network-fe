@@ -1,8 +1,8 @@
 import { useContext } from 'react';
 import { RiCloseFill, RiPhoneFill } from 'react-icons/ri';
 
-import { OpenContext } from '../../context/OpenContext';
-import { SocketContext } from '../../context/SocketContext';
+import { OpenContext } from '@/context/OpenContext';
+import { SocketContext } from '@/context/SocketContext';
 
 import './modal.scss';
 function AudioCallModal() {
