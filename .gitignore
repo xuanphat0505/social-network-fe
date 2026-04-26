@@ -25,3 +25,6 @@ dist-ssr
 
 # agent
 .agent
+
+# config
+src/config/

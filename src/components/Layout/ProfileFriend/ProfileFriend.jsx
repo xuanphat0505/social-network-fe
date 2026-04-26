@@ -10,7 +10,7 @@ import {
   RiAttachmentLine,
   RiUser2Fill
 } from "react-icons/ri";
-import { STATUS_COLOR_CLASSES } from "../../../config/statusColors";
+import { STATUS_COLOR_CLASSES } from "@/config/statusColors";
 
 const ProfileFriend = ({ open, onClose, receiver, files, pinnedMessages }) => {
 

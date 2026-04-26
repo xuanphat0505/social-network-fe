@@ -6,18 +6,17 @@ import {
   RiDeleteBinLine,
   RiFileCopyLine,
   RiSaveLine,
-  RiChatSmile2Line,
 } from "react-icons/ri";
 import { useTranslation } from "react-i18next";
 import Lottie from "lottie-react";
-import emptyChat from "../../../assets/lottie/empty-chat.json";
+import emptyChat from "@/assets/lottie/empty-chat.json";
 
-import { OpenContext } from "../../../context/OpenContext";
-import { AxiosContext } from "../../../context/AxiosContext";
-import ProfileFriend from "../ProfileFriend/ProfileFriend";
-import UserChatContent from "./UserChatContent";
-import UserchatFooter from "./UserchatFooter";
-import UserchatHeader from "./UserchatHeader";
+import { OpenContext } from "@/context/OpenContext";
+import { AxiosContext } from "@/context/AxiosContext";
+import ProfileFriend from "@/components/Layout/ProfileFriend/ProfileFriend";
+import { UserChatContent } from "./ChatBody";
+import { UserchatFooter } from "./ChatFooter";
+import { UserchatHeader } from "./ChatHeader";
 
 import "./userchat.scss";
 function UserChatContainer() {

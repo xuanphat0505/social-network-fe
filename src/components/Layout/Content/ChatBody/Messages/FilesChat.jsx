@@ -1,6 +1,6 @@
 import { RiDownload2Line, RiFileTextFill } from "react-icons/ri";
 
-import "./userchat.scss";
+import "@/components/Layout/Content/userchat.scss";
 function FilesChat({ files }) {
   return (
     <ul className="message-files mt-2">

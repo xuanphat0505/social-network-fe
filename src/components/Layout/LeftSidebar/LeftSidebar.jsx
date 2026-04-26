@@ -1,10 +1,10 @@
 import { useContext } from "react";
 
-import { NavLinkContext } from "../../../context/NavLinkContext";
-import Profile from "../../../components/Profile/Profile";
-import ChatList from "../../ChatList/ChatList";
-import Contacts from "../../Contacts/Contacts";
-import Setting from "../../Setting/Setting";
+import { NavLinkContext } from "@/context/NavLinkContext";
+import Profile from "@/components/Profile/Profile";
+import ChatList from "@/components/ChatList/ChatList";
+import Contacts from "@/components/Contacts/Contacts";
+import Setting from "@/components/Setting/Setting";
 
 function LeftSidebar() {
   const { navLink } = useContext(NavLinkContext);

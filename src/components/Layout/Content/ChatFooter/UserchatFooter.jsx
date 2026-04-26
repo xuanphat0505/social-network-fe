@@ -10,28 +10,23 @@ import {
   RiCloseLine,
 } from 'react-icons/ri';
 import { toast } from 'react-toastify';
-import EmojiPicker from 'emoji-picker-react';
 import Tippy from '@tippyjs/react';
-import { io } from 'socket.io-client';
 
-import { ThemeContext } from '../../../context/ThemeContext';
-import { BASE_URL, SOCKET_URL } from '../../../config/utils';
-import { AxiosContext } from '../../../context/AxiosContext';
-import { SocketContext } from '../../../context/SocketContext';
-import useAxiosJWT from '../../../config/axiosConfig';
-import Loader from '../../../shared/Loader/Loader';
+import { ThemeContext } from '@/context/ThemeContext';
+import ChatEmojiPicker from '@/shared/ChatEmojiPicker/ChatEmojiPicker';
+import { BASE_URL } from '@/config/utils';
+import { AxiosContext } from '@/context/AxiosContext';
+import { SocketContext } from '@/context/SocketContext';
+import useAxiosJWT from '@/config/axiosConfig';
+import Loader from '@/shared/Loader/Loader';
 
-import './userchat.scss';
+import '../userchat.scss';
 function UserchatFooter({ receiverId }) {
   const getAxiosJWT = useAxiosJWT();
   const axiosJWT = getAxiosJWT();
   const user = useSelector((state) => state.auth?.user);
-  const socket = io(SOCKET_URL, {
-    withCredentials: true,
-    transports: ['websocket'],
-  });
   const { theme } = useContext(ThemeContext);
-  const { blockedBy } = useContext(SocketContext);
+  const { socket, blockedBy } = useContext(SocketContext);
   const { setMessages, setChatList, isBlockedByReceiver } = useContext(AxiosContext);
 
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -247,9 +242,8 @@ function UserchatFooter({ receiverId }) {
                 onClick={() => setShowEmojiPicker((prev) => !prev)}
               />
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-[999]">
-                <EmojiPicker
+                <ChatEmojiPicker
                   open={showEmojiPicker}
-                  lazyLoadEmojis={true}
                   theme={theme}
                   width={300}
                   height={400}

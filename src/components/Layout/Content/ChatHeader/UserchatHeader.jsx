@@ -22,12 +22,12 @@ import {
 import Tippy from "@tippyjs/react";
 import { useTranslation } from "react-i18next";
 
-import { STATUS_COLOR_CLASSES } from "../../../config/statusColors";
-import { OpenContext } from "../../../context/OpenContext";
-import { SocketContext } from "../../../context/SocketContext";
-import { AxiosContext } from "../../../context/AxiosContext";
+import { STATUS_COLOR_CLASSES } from "@/config/statusColors";
+import { OpenContext } from "@/context/OpenContext";
+import { SocketContext } from "@/context/SocketContext";
+import { AxiosContext } from "@/context/AxiosContext";
 
-import "./userchat.scss";
+import "../userchat.scss";
 function UserchatHeader({ setOpenProfileFriend, receiver, handleClearSearch }) {
   const user = useSelector((state) => state.auth?.user);
   const { t } = useTranslation();
@@ -60,7 +60,9 @@ function UserchatHeader({ setOpenProfileFriend, receiver, handleClearSearch }) {
   const setMutedUsers = (list) => {
     try {
       localStorage.setItem("muted_users", JSON.stringify(list));
-    } catch (e) { /* empty */ }
+    } catch (e) {
+      /* empty */
+    }
   };
 
   useEffect(() => {
@@ -239,7 +241,7 @@ function UserchatHeader({ setOpenProfileFriend, receiver, handleClearSearch }) {
                         username: receiver.username,
                         avatar: receiver.avatar,
                       },
-                      false
+                      false,
                     )
                   }
                   type="text"
@@ -258,7 +260,7 @@ function UserchatHeader({ setOpenProfileFriend, receiver, handleClearSearch }) {
                         username: receiver.username,
                         avatar: receiver.avatar,
                       },
-                      true
+                      true,
                     )
                   }
                   type="text"
@@ -287,7 +289,9 @@ function UserchatHeader({ setOpenProfileFriend, receiver, handleClearSearch }) {
                   content={
                     <div className={`dropdown-menu show`}>
                       <button onClick={handleToggleMute}>
-                        {isMuted ? t("chatOption.unmute") : t("chatOption.mute")}
+                        {isMuted
+                          ? t("chatOption.unmute")
+                          : t("chatOption.mute")}
                         <i>
                           <RiVolumeMuteLine />
                         </i>
@@ -383,7 +387,7 @@ function UserchatHeader({ setOpenProfileFriend, receiver, handleClearSearch }) {
                                   username: receiver.username,
                                   avatar: receiver.avatar,
                                 },
-                                false
+                                false,
                               )
                             }
                           >
@@ -400,7 +404,7 @@ function UserchatHeader({ setOpenProfileFriend, receiver, handleClearSearch }) {
                                   username: receiver.username,
                                   avatar: receiver.avatar,
                                 },
-                                true
+                                true,
                               )
                             }
                           >

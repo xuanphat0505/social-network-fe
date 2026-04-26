@@ -4,10 +4,10 @@ import { toast } from "react-toastify";
 import { Button, Form } from "antd";
 import { RiCloseFill } from "react-icons/ri";
 
-import useAxiosJWT from "../../config/axiosConfig";
-import { OpenContext } from "../../context/OpenContext";
-import { BASE_URL } from "../../config/utils";
-import Loader from "../../shared/Loader/Loader";
+import useAxiosJWT from "@/config/axiosConfig";
+import { OpenContext } from "@/context/OpenContext";
+import { BASE_URL } from "@/config/utils";
+import QRCodeTab from "./QRCodeTab";
 
 import "./modal.scss";
 function ContactModal() {
@@ -28,13 +28,12 @@ function ContactModal() {
     setReceiverInfo((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSendInvitation = async (payload) => {
     setIsLoading(true);
     try {
       const res = await axiosJWT.post(
         `${BASE_URL}/contacts/add`,
-        receiverInfo,
+        payload,
         {
           headers: {
             Authorization: `Bearer ${user?.accessToken}`,
@@ -53,6 +52,11 @@ function ContactModal() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    handleSendInvitation(receiverInfo);
   };
   
   return (
@@ -94,14 +98,25 @@ function ContactModal() {
               >
                 User Code
               </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("qr")}
+                className={`flex-1 py-2 text-sm font-medium transition-colors duration-200 hover:text-[#7269ef] ${
+                  activeTab === "qr" ? "text-[#7269ef]" : ""
+                }`}
+              >
+                QR Code
+              </button>
               <span
                 className={`absolute bottom-0 h-[2px] bg-[#7269ef] transition-transform duration-300 ease-in-out`}
                 style={{
-                  width: "50%", // vì có 2 tab nên 50%
+                  width: "33.33%", // 3 tabs
                   transform:
                     activeTab === "info"
                       ? "translateX(0%)"
-                      : "translateX(100%)",
+                      : activeTab === "code"
+                      ? "translateX(100%)"
+                      : "translateX(200%)",
                 }}
               />
             </div>
@@ -144,6 +159,16 @@ function ContactModal() {
                       ></input>
                     </div>
                   </>
+                )}
+                {activeTab === "qr" && (
+                  <QRCodeTab
+                    user={user}
+                    onScanSuccess={(code) => {
+                      setReceiverInfo({ username: "", email: "", code });
+                      toast.info("QR Scanned! Sending invitation...");
+                      handleSendInvitation({ username: "", email: "", code });
+                    }}
+                  />
                 )}
               </form>
             </div>

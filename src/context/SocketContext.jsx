@@ -2,13 +2,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { createContext, useEffect, useRef, useState, useContext } from "react";
 import { io } from "socket.io-client";
 
-import { SOCKET_URL } from "../config/utils";
-import { loginSuccess } from "../redux/authSlice";
-import { AxiosContext } from "./AxiosContext";
+import { SOCKET_URL } from "@/config/utils";
+import { loginSuccess } from "@/redux/authSlice";
+import { AxiosContext } from "@/context/AxiosContext";
 import { toast } from "react-toastify";
-import { OpenContext } from "./OpenContext";
-import ringTone from "../assets/sounds/facebook_call.mp3";
-import messageSound from "../assets/sounds/facebook_message.mp3";
+import { OpenContext } from "@/context/OpenContext";
+import ringTone from "@/assets/sounds/facebook_call.mp3";
+import messageSound from "@/assets/sounds/facebook_message.mp3";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const SocketContext = createContext();

@@ -1,14 +1,13 @@
 import { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { IoChevronDown, IoChevronUp } from "react-icons/io5";
-import { RiEditFill, RiUser2Line, RiMailLine, RiMapPin2Line, RiQuillPenLine } from "react-icons/ri";
+import { RiUser2Line, RiMailLine, RiMapPin2Line, RiQuillPenLine } from "react-icons/ri";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
-import useAxiosJWT from "../../config/axiosConfig";
-import { loginSuccess } from "../../redux/authSlice";
-import { BASE_URL } from "../../config/utils";
-import Loader from "../../shared/Loader/Loader";
+import useAxiosJWT from "@/config/axiosConfig";
+import { loginSuccess } from "@/redux/authSlice";
+import { BASE_URL } from "@/config/utils";
 
 function PersonalInfo({ toggleSetting, settingOption, info }) {
   const dispatch = useDispatch();

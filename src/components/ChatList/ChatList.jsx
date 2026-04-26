@@ -17,6 +17,7 @@ import { AxiosContext } from "../../context/AxiosContext";
 import { STATUS_COLOR_CLASSES } from "../../config/statusColors";
 import ChatListSkeleton from "../../shared/Skeleton/ChatListSkeleton";
 import AvailableSkeleton from "../../shared/Skeleton/AvailableSkeleton";
+import { formatTime } from "../../utils/date";
 
 function ChatList({ navLink }) {
   const user = useSelector((state) => state?.auth?.user);
@@ -62,14 +63,7 @@ function ChatList({ navLink }) {
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  const formatToTime = (isoString) => {
-    const date = new Date(isoString);
-    const hours = date.getHours();
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    const ampm = hours >= 12 ? "PM" : "AM";
-    const hours24 = hours.toString().padStart(2, "0");
-    return `${hours24}:${minutes} ${ampm}`;
-  };
+
 
   return (
     <div className={`tab-pane ${navLink === "chats" ? "active" : ""}`}>
@@ -231,7 +225,7 @@ function ChatList({ navLink }) {
 
                       <div className="block h-full w-auto">
                         <div className="text-[11px]">
-                          {formatToTime(chat?.createdAt)}
+                          {formatTime(chat?.createdAt)}
                         </div>
                         {chat.unreadCount > 0 && (
                           <span className="badge text-[10px] font-semibold leading-[16px] mt-[5px]">
