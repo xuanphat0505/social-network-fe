@@ -56,10 +56,27 @@ const QRCodeTab = ({ user, onScanSuccess }) => {
         cameraId,
         config,
         (decodedText) => {
-          if (decodedText.startsWith("vchat:friend_code:") && !hasScannedRef.current) {
+          let friendCode = null;
+          
+          // Kiểm tra định dạng cũ: vchat:friend_code:CODE
+          if (decodedText.startsWith("vchat:friend_code:")) {
+            friendCode = decodedText.replace("vchat:friend_code:", "");
+          } 
+          // Kiểm tra định dạng URL mới: http://domain/?add-friend=CODE
+          else if (decodedText.includes("add-friend=")) {
+            try {
+              const url = new URL(decodedText);
+              friendCode = url.searchParams.get("add-friend");
+            } catch (e) {
+              // Fallback nếu chuỗi không phải URL hợp lệ nhưng chứa param
+              const match = decodedText.match(/add-friend=([^&]+)/);
+              if (match) friendCode = match[1];
+            }
+          }
+
+          if (friendCode && !hasScannedRef.current) {
             hasScannedRef.current = true; // Đánh dấu đã quét để không trùng lặp
-            const scannedCode = decodedText.replace("vchat:friend_code:", "");
-            onScanSuccess(scannedCode);
+            onScanSuccess(friendCode);
             stopScanner();
           }
         },
@@ -119,7 +136,11 @@ const QRCodeTab = ({ user, onScanSuccess }) => {
     img.src = "data:image/svg+xml;base64," + btoa(svgData);
   };
 
-  const qrData = `vchat:friend_code:${user?.code}`;
+  /**
+   * Dữ liệu QR Code: Sử dụng URL để camera điện thoại có thể nhận diện và mở web tự động
+   * Định dạng: https://domain.com/?add-friend=CODE
+   */
+  const qrData = `${window.location.origin}/?add-friend=${user?.code}`;
 
   return (
     <div className="qr-code-tab-content">
