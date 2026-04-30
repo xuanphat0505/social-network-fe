@@ -1,4 +1,5 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { Button, Form } from "antd";
@@ -22,6 +23,43 @@ function ContactModal() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("info");
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  /**
+   * Tự động xử lý khi có mã kết bạn:
+   * - Ưu tiên đọc từ URL param (?add-friend=CODE) - trường hợp đã login sẵn
+   * - Fallback đọc từ localStorage (pending_add_friend) - trường hợp vừa login xong
+   */
+  useEffect(() => {
+    if (!user) return;
+
+    // Ưu tiên lấy từ URL param
+    const codeFromUrl = searchParams.get("add-friend");
+    // Fallback lấy từ localStorage (được lưu trước khi redirect sang login)
+    const codeFromStorage = localStorage.getItem("pending_add_friend");
+    const friendCode = codeFromUrl || codeFromStorage;
+
+    if (!friendCode) return;
+
+    // Mở modal và chuyển sang tab nhập mã
+    setOpenContactModal(true);
+    setActiveTab("code");
+    setReceiverInfo(prev => ({ ...prev, code: friendCode }));
+
+    // Tự động gửi lời mời
+    toast.info(`Đang tự động gửi lời mời kết bạn...`);
+    handleSendInvitation({ username: "", email: "", code: friendCode });
+
+    // Dọn dẹp: xóa URL param và localStorage để tránh lặp lại khi refresh
+    if (codeFromUrl) {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete("add-friend");
+      setSearchParams(newParams, { replace: true });
+    }
+    if (codeFromStorage) {
+      localStorage.removeItem("pending_add_friend");
+    }
+  }, [user]); // Chỉ chạy khi user thay đổi (login/logout)
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -130,6 +168,7 @@ function ContactModal() {
                       onChange={handleChange}
                       type="text"
                       id="code"
+                      value={receiverInfo.code}
                       placeholder="Enter user code"
                     ></input>
                   </div>

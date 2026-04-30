@@ -1,6 +1,6 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 
 import { ToastContainer } from "react-toastify";
 import { ThemeContext } from "./context/ThemeContext";
@@ -13,6 +13,25 @@ import StartedContainer from "./pages/StartedContainer";
 import ResetPassword from "./pages/ResetPassword";
 import OTPForm from "./pages/OTPForm";
 import SystemBroadcastBanner from "./components/SystemBroadcastBanner";
+
+/**
+ * Hàm tạo Navigate element và lưu mã kết bạn pending vào localStorage
+ * để xử lý sau khi đăng nhập thành công
+ */
+function ProtectedRedirect() {
+  const location = useLocation();
+
+  useEffect(() => {
+    // Lưu mã kết bạn vào localStorage trước khi redirect sang trang login
+    const params = new URLSearchParams(location.search);
+    const friendCode = params.get("add-friend");
+    if (friendCode) {
+      localStorage.setItem("pending_add_friend", friendCode);
+    }
+  }, [location.search]);
+
+  return <Navigate to="/login" replace />;
+}
 
 function App() {
   const { theme } = useContext(ThemeContext);
@@ -28,7 +47,7 @@ function App() {
         <Routes>
           <Route
             path="/"
-            element={user ? <Home /> : <Navigate to={"/login"} replace />}
+            element={user ? <Home /> : <ProtectedRedirect />}
           ></Route>
           <Route path="/login" element={<Login />}></Route>
           <Route path="/register" element={<SignIn />}></Route>
