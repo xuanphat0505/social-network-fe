@@ -256,6 +256,7 @@ function Sidebar({ isFirstLogin }) {
           className="dropdown"
           interactive={true}
           arrow={false}
+          onClickOutside={() => setOpenAvatarMenu(false)}
           content={
             openLanguageMenu ? (
               <div className={`dropdown-menu show`}>
@@ -321,7 +322,10 @@ function Sidebar({ isFirstLogin }) {
         >
           <li className="nav-item avatar-sidebar my-[2px] hidden relative">
             <Link
-              onClick={() => handleToggleAvatarDropdown()}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleToggleAvatarDropdown();
+              }}
               to={"#"}
               className={`flex items-center justify-center w-[56px] h-[56px] leading-[56px] text-center text-[24px] rounded-[8px] text-body-color mb-2 font-medium`}
             >
@@ -339,6 +343,7 @@ function Sidebar({ isFirstLogin }) {
           interactive={true}
           arrow={false}
           visible={openLanguageMenu}
+          onClickOutside={() => setOpenLanguageMenu(false)}
           content={
             <div className={`dropdown-menu show language-menu`}>
               {languages.map((item, index) => (
@@ -360,7 +365,10 @@ function Sidebar({ isFirstLogin }) {
         >
           <li className="nav-item my-[2px] relative">
             <Link
-              onClick={() => setOpenLanguageMenu((prev) => !prev)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpenLanguageMenu((prev) => !prev);
+              }}
               to={"#"}
               className={`block w-[56px] h-[56px] leading-[56px] text-center text-[24px] rounded-[8px] text-body-color mb-2 font-medium                  `}
             >
@@ -390,6 +398,7 @@ function Sidebar({ isFirstLogin }) {
           className="dropdown"
           interactive={true}
           arrow={false}
+          onClickOutside={() => setOpenAvatarMenu(false)}
           content={
             <div className={`dropdown-menu show`}>
               <button type="button" onClick={handleLogout}>
@@ -411,7 +420,10 @@ function Sidebar({ isFirstLogin }) {
         >
           <li className="nav-item my-[2px] relative">
             <Link
-              onClick={() => setOpenAvatarMenu((prev) => !prev)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpenAvatarMenu((prev) => !prev);
+              }}
               to={"#"}
               className={`flex items-center justify-center w-[56px] h-[56px] leading-[56px] text-center text-[24px] rounded-[8px] text-body-color mb-2 font-medium`}
             >

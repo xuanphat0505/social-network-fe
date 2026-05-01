@@ -239,7 +239,10 @@ function UserchatFooter({ receiverId }) {
                 type="text"
                 icon={<RiEmotionHappyLine />}
                 className="chat-icon"
-                onClick={() => setShowEmojiPicker((prev) => !prev)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowEmojiPicker((prev) => !prev);
+                }}
               />
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-[999]">
                 <ChatEmojiPicker
@@ -247,6 +250,7 @@ function UserchatFooter({ receiverId }) {
                   theme={theme}
                   width={300}
                   height={400}
+                  onClickOutside={() => setShowEmojiPicker(false)}
                   onEmojiClick={(emojiData) => setContent((prev) => prev + emojiData.emoji)}
                 />
               </div>

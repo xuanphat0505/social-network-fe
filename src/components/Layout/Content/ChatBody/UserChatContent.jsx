@@ -330,11 +330,8 @@ function UserChatContent({
             );
           }
 
-          const { showAvatar, showTimestamp, isDifferentDay } = getMessageLayoutMeta(
-            uniqueDisplayMessages,
-            message,
-            index,
-          );
+          const { showAvatar, showTimestamp, isDifferentDay } =
+            getMessageLayoutMeta(uniqueDisplayMessages, message, index);
 
           return (
             <MessageItem

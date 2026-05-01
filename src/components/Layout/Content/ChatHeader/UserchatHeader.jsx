@@ -224,7 +224,10 @@ function UserchatHeader({ setOpenProfileFriend, receiver, handleClearSearch }) {
                 <div className="cursor-pointer">
                   <Button
                     type="text"
-                    onClick={() => setOpenSearchMessage((prev) => !prev)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenSearchMessage((prev) => !prev);
+                    }}
                     className="search-message-btn"
                     icon={<RiSearchLine />}
                   ></Button>
@@ -286,6 +289,7 @@ function UserchatHeader({ setOpenProfileFriend, receiver, handleClearSearch }) {
                   visible={openMoreMenu}
                   arrow={false}
                   interactive={true}
+                  onClickOutside={() => setOpenMoreMenu(false)}
                   content={
                     <div className={`dropdown-menu show`}>
                       <button onClick={handleToggleMute}>
@@ -430,7 +434,10 @@ function UserchatHeader({ setOpenProfileFriend, receiver, handleClearSearch }) {
                   }
                 >
                   <Button
-                    onClick={() => setOpenMoreMenu((prev) => !prev)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenMoreMenu((prev) => !prev);
+                    }}
                     type="text"
                     className="search-message-btn"
                     icon={<RiMoreFill />}

@@ -93,6 +93,9 @@ const MessageItem = memo(
                     className="wrap-content select-none"
                     onTouchStart={() => touchStart(message._id)}
                     onTouchEnd={touchEnd}
+                    onMouseDown={() => touchStart(message._id)}
+                    onMouseUp={touchEnd}
+                    onMouseLeave={touchEnd}
                   >
                     {display.type === "revoked" ? (
                       <RevokedMessage text={display.text} />
@@ -146,8 +149,13 @@ const MessageItem = memo(
                     {!(message.isRevoked || isActuallyDeleted) && (
                       <>
                         <Link
-                          onClick={() => handleReactionEmoji(message._id)}
-                          className="text-secondary-color text-[20px] p-1 relative"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleReactionEmoji(
+                              openReactionEmoji === message._id ? null : message._id
+                            );
+                          }}
+                          className="hidden lg:block text-secondary-color text-[20px] p-1 relative"
                         >
                           <i>
                             <MdOutlineEmojiEmotions />
