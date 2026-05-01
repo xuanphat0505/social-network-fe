@@ -24,14 +24,11 @@ import {
   logoutFailed,
 } from "../../../redux/authSlice";
 import { BASE_URL } from "@/config/utils";
-import useAxiosJWT from "@/config/axiosConfig";
 import logoImg from "@/assets/images/logo.svg";
 import Loader from "@/shared/Loader/Loader";
 import { AxiosContext } from "@/context/AxiosContext";
 
 function Sidebar({ isFirstLogin }) {
-  const getAxiosJWT = useAxiosJWT();
-  const axiosJWT = getAxiosJWT();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth?.user);

@@ -481,3 +481,99 @@
     }
   }
 }
+
+// Modern Video Call Modal
+.video-call-modal-modern {
+  width: 90%;
+  max-width: 1000px;
+  height: 80vh;
+  margin: 0 !important;
+  transition: width 0.3s ease, height 0.3s ease;
+
+  &.minimized {
+    width: 150px;
+    min-width: 300px !important;
+    height: 200px;
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 9999;
+    margin: 0 !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    
+    .video-modal-content-modern {
+      border-radius: 1.5rem;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .local-video-container {
+      display: none;
+    }
+
+    .controls-overlay {
+      padding: 1rem;
+      gap: 0.5rem;
+    }
+  }
+
+  .video-modal-content-modern {
+    height: 100%;
+    width: 100%;
+    background: #1a1a1a;
+    border: none;
+    display: flex;
+    flex-direction: column;
+
+    .remote-video-container {
+      background: radial-gradient(circle at center, #2c2c2c 0%, #1a1a1a 100%);
+    }
+
+    .local-video-container {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 100;
+      
+      video {
+        border-radius: inherit;
+      }
+    }
+
+    .controls-overlay {
+      pointer-events: none;
+      button, .timer {
+        pointer-events: auto;
+      }
+    }
+  }
+}
+
+.minimized-wrapper {
+  pointer-events: none !important;
+  background: transparent !important;
+  
+  .modal {
+    pointer-events: none !important;
+    display: block !important; // Để không bị flex center ép vị trí
+  }
+}
+
+@media (max-width: 768px) {
+  .video-call-modal-modern {
+    width: 100%;
+    height: 100vh;
+    border-radius: 0 !important;
+    
+    &.minimized {
+      width: 150px;
+      min-width: 150px !important;
+      height: 200px;
+      bottom: 1rem;
+      right: 1rem;
+    }
+
+    .local-video-container {
+      width: 100px;
+      bottom: 1rem;
+      right: 1rem;
+    }
+  }
+}

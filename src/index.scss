@@ -1305,7 +1305,7 @@
 @media screen and (max-width: 576px) {
   .modal-container {
     .modal {
-      .modal-centered {
+      .modal-centered:not(.minimized) {
         min-width: 100% !important;
         padding: 0 10px;
         .modal-content {

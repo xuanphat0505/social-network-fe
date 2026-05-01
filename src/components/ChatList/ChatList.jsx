@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -35,15 +35,21 @@ function ChatList({ navLink }) {
     loadingAvailable,
   } = useContext(AxiosContext);
 
-  const handleOpenChatBoxAndGetMessages = (partnerId) => {
-    setOpenChatBox((prev) => {
-      const next = prev === partnerId ? null : partnerId;
-      if (next) handleGetMessage(next, true);
-      return next;
-    });
-    handleReadMessage(partnerId);
-    handleGetReceiver(partnerId);
-  };
+  const handleOpenChatBoxAndGetMessages = useCallback(
+    (partnerId) => {
+      if (!partnerId) return;
+
+      const shouldClose = openChatBox === partnerId;
+      setOpenChatBox(shouldClose ? null : partnerId);
+
+      if (shouldClose) return;
+
+      handleReadMessage(partnerId);
+      handleGetReceiver(partnerId);
+      handleGetMessage(partnerId, true);
+    },
+    [handleGetMessage, handleGetReceiver, handleReadMessage, openChatBox, setOpenChatBox],
+  );
 
   // Responsive skeleton count for available section
   const [availableSkeletonCount, setAvailableSkeletonCount] = useState(4);

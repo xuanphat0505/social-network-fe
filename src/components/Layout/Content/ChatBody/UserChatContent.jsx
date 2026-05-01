@@ -14,8 +14,8 @@ import { OpenContext } from "@/context/OpenContext";
 import MessageSkeleton from "@/shared/Skeleton/MessageSkeleton";
 import { SocketContext } from "@/context/SocketContext";
 import { AxiosContext } from "@/context/AxiosContext";
-import { isDifferentDay } from "@/utils/date";
 import { MessageItem } from "./Messages";
+import { getMessageLayoutMeta } from "@/utils/messageLayout";
 
 import "../userchat.scss";
 function UserChatContent({
@@ -54,8 +54,7 @@ function UserChatContent({
 
   // Loại bỏ trùng _id trước khi render để tránh trùng key
   const uniqueDisplayMessages = useMemo(() => {
-    // Thêm typing indicator nếu có typing event
-    const displayMessages =
+    const baseMessages =
       typingUserId === receiver?._id
         ? [
             ...messages,
@@ -69,14 +68,16 @@ function UserChatContent({
 
     const seen = new Set();
     const result = [];
-    for (const msg of displayMessages) {
+
+    for (const msg of baseMessages) {
       const key =
         msg && msg._id ? String(msg._id) : `temp-${msg?.type || "unknown"}`;
-      if (!seen.has(key)) {
-        seen.add(key);
-        result.push(msg);
-      }
+
+      if (seen.has(key)) continue;
+      seen.add(key);
+      result.push(msg);
     }
+
     return result;
   }, [messages, typingUserId, receiver?._id, receiver?.avatar]);
 
@@ -329,18 +330,10 @@ function UserChatContent({
             );
           }
 
-          // Tìm tin nhắn trước đó (không phải typing indicator)
-          let prevMessage = null;
-          for (let i = index - 1; i >= 0; i--) {
-            if (uniqueDisplayMessages[i].type !== "typing") {
-              prevMessage = uniqueDisplayMessages[i];
-              break;
-            }
-          }
-
-          const isDifferentDayValue = isDifferentDay(
-            message.createdAt,
-            prevMessage?.createdAt,
+          const { showAvatar, showTimestamp, isDifferentDay } = getMessageLayoutMeta(
+            uniqueDisplayMessages,
+            message,
+            index,
           );
 
           return (
@@ -349,7 +342,9 @@ function UserChatContent({
               message={message}
               user={user}
               index={index}
-              isDifferentDay={isDifferentDayValue}
+              isDifferentDay={isDifferentDay}
+              showAvatar={showAvatar}
+              showTimestamp={showTimestamp}
               hightlightMessage={hightlightMessage}
               messageRefs={messageRefs}
               touchStart={touchStart}

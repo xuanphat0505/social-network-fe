@@ -27,8 +27,9 @@ const MessageItem = memo(
   ({
     message,
     user,
-    index,
+
     isDifferentDay,
+    showAvatar,
     hightlightMessage,
     messageRefs,
     touchStart,
@@ -49,6 +50,7 @@ const MessageItem = memo(
   }) => {
     const display = getDisplayContent(message, user?._id);
     const isMe = message.senderId?._id === user?._id;
+    const shouldShowAvatar = showAvatar ?? message.showAvatar ?? true;
 
     // Render call messages separately
     if (message.type === "call" && message.callData) {
@@ -64,7 +66,7 @@ const MessageItem = memo(
               status={message.callData?.status || "ended"}
               duration={message.callData?.duration || 0}
               timestamp={message.createdAt}
-              showAvatar={message.showAvatar}
+              showAvatar={shouldShowAvatar}
               avatar={message.senderId?.avatar}
               username={message.senderId?.username}
             />
@@ -82,9 +84,7 @@ const MessageItem = memo(
         <li className={isMe ? "right" : ""}>
           <div className="conversation-list">
             <div className="message-avatar w-[36px] h-[36px]">
-              {message.showAvatar && (
-                <img src={message.senderId?.avatar} alt="avatar" />
-              )}
+              {shouldShowAvatar && <img src={message.senderId?.avatar} alt="avatar" />}
             </div>
             <div className="message-content">
               <div className="list-content">
@@ -183,7 +183,7 @@ const MessageItem = memo(
                 </div>
               </div>
 
-              {message.showAvatar && (
+              {shouldShowAvatar && (
                 <div className="message-name text-[14px] font-medium">
                   {message.senderId?.username}
                 </div>
