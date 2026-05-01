@@ -90,7 +90,7 @@ const MessageItem = memo(
               <div className="list-content">
                 <div className="content-item relative">
                   <div
-                    className="wrap-content select-none"
+                    className={`wrap-content select-none ${message.status === 'sending' ? 'sending' : ''}`}
                     onTouchStart={() => touchStart(message._id)}
                     onTouchEnd={touchEnd}
                     onMouseDown={() => touchStart(message._id)}

@@ -152,11 +152,30 @@ export function useSocketManager({ axiosContext, openContext }) {
 
       if (isMessageForCurrentUser && isCurrentChat) {
         setMessages((prev) => {
-          const showAvatar = getMessageLayoutMeta(prev, message, prev.length).showAvatar;
+          // Tránh lặp tin nhắn nếu tin nhắn đã tồn tại (check _id)
+          if (prev.some((m) => m._id === message._id)) return prev;
 
+          // Tìm tin nhắn tạm (optimistic) để thay thế
+          // Ưu tiên khớp content và senderId
+          const optimisticIdx = prev.findIndex(
+            (m) =>
+              m.isOptimistic &&
+              String(m.senderId._id) === String(message.senderId._id) &&
+              m.content === message.content
+          );
+
+          if (optimisticIdx !== -1) {
+            const updatedMessages = [...prev];
+            const meta = getMessageLayoutMeta(prev, message, optimisticIdx);
+            updatedMessages[optimisticIdx] = { ...message, showAvatar: meta.showAvatar };
+            return updatedMessages;
+          }
+
+          const showAvatar = getMessageLayoutMeta(prev, message, prev.length).showAvatar;
           return [...prev, { ...message, showAvatar }];
         });
       } else if (isMessageForCurrentUser && !receiver) {
+
         const partner =
           String(message?.senderId?._id) === String(user?._id)
             ? message?.receiverId?._id
