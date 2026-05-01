@@ -130,7 +130,7 @@ function AvatarModal() {
           <div className="modal-content avatar-modal-content relative">
             <span
               onClick={() => setOpenAvatarModal(false)}
-              className="absolute top-[25px] right-[10px] cursor-pointer w-8 h-8 flex items-center justify-center text-[20px] hover:text-[#fff]"
+              className="absolute top-3 right-3 md:top-[25px] md:right-[10px] cursor-pointer w-8 h-8 flex items-center justify-center text-[20px] hover:text-[#fff] z-10"
             >
               <i>
                 <RiCloseFill />

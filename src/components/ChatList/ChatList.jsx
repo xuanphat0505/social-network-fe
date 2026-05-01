@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -53,6 +53,7 @@ function ChatList({ navLink }) {
 
   // Responsive skeleton count for available section
   const [availableSkeletonCount, setAvailableSkeletonCount] = useState(4);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const computeItems = () => {
@@ -69,7 +70,23 @@ function ChatList({ navLink }) {
     return () => window.removeEventListener("resize", update);
   }, []);
 
+  const filteredChatList = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase();
+    if (!query) return chatList;
 
+    return chatList.filter((chat) => {
+      const isMe = chat?.senderId?._id === user?._id;
+      const partner = isMe ? chat?.receiverId : chat?.senderId;
+      const username = partner?.username?.toLowerCase() || "";
+      const content = chat?.content?.toLowerCase() || "";
+      const typeLabel = chat?.type?.toLowerCase() || "";
+      return (
+        username.includes(query) ||
+        content.includes(query) ||
+        typeLabel.includes(query)
+      );
+    });
+  }, [chatList, searchTerm, user?._id]);
 
   return (
     <div className={`tab-pane ${navLink === "chats" ? "active" : ""}`}>
@@ -86,7 +103,9 @@ function ChatList({ navLink }) {
               <input
                 type="text"
                 placeholder={t("chatInputPlaceholder")}
-              ></input>
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
           </div>
         </div>
@@ -131,9 +150,9 @@ function ChatList({ navLink }) {
                 <ChatListSkeleton key={index} />
               ))}
             </ul>
-          ) : chatList.length > 0 ? (
+          ) : filteredChatList.length > 0 ? (
             <ul className="simple-bar-wrapper chat-list">
-              {chatList.map((chat) => {
+              {filteredChatList.map((chat) => {
                 const isMe = chat?.senderId?._id === user?._id;
                 const partner = isMe ? chat?.receiverId : chat?.senderId;
 
@@ -246,6 +265,15 @@ function ChatList({ navLink }) {
                 );
               })}
             </ul>
+          ) : searchTerm.trim() ? (
+            <div
+              className="flex items-center justify-center"
+              style={{ minHeight: "calc(90vh - 250px)" }}
+            >
+              <p className="text-[15px] text-body-color text-center">
+                {t("noMessages")}
+              </p>
+            </div>
           ) : (
             <div
               className="flex items-center justify-center"

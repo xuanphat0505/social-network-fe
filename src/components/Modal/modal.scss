@@ -65,6 +65,16 @@
           }
         }
         .modal-body {
+          flex: 1;
+          overflow-y: auto;
+          &::-webkit-scrollbar {
+            width: 4px;
+            background-color: transparent;
+          }
+          &::-webkit-scrollbar-thumb {
+            background-color: #cbd5e0;
+            border-radius: 10px;
+          }
           .modal-input-group {
             width: 100%;
             label {
@@ -72,8 +82,8 @@
               margin-bottom: 0.5rem;
               font-weight: 500;
             }
-            input[type="text"],
-            input[type="email"],
+            input[type='text'],
+            input[type='email'],
             textarea {
               display: block;
               width: 100%;
@@ -340,6 +350,93 @@
   }
 }
 
+@media (max-width: 768px) {
+  .modal-container {
+    .modal {
+      align-items: flex-start;
+      padding: 1rem 0;
+
+      .modal-centered {
+        min-width: calc(100vw - 1rem);
+        margin: 0.5rem !important;
+
+        .modal-content {
+          max-height: calc(100vh - 2rem);
+          overflow-y: auto;
+          overflow-x: hidden;
+        }
+      }
+    }
+  }
+
+  .avatar-modal-content {
+    min-width: calc(100vw - 1rem) !important;
+    max-width: calc(100vw - 1rem) !important;
+    padding: 0.75rem;
+    border-radius: 16px;
+
+    .modal-title {
+      padding: 0.75rem 0.75rem 0.5rem;
+
+      h4 {
+        font-size: 15px;
+      }
+    }
+
+    .avatar-tabs {
+      padding: 0 0.75rem;
+      gap: 0.25rem;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+
+      .tab-btn {
+        flex: 1 0 auto;
+        padding: 0.65rem 1rem;
+        white-space: nowrap;
+      }
+    }
+
+    .modal-body {
+      padding: 0.75rem !important;
+      max-height: calc(100vh - 260px);
+      overflow-y: auto;
+    }
+
+    .avatar-list {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin: 0.75rem 0 1rem 0;
+    }
+
+    .avatar-item {
+      height: 84px;
+    }
+
+    .upload-section {
+      min-height: 260px;
+
+      .upload-placeholder,
+      .preview-container {
+        min-height: 260px;
+      }
+
+      .preview-container .preview-image {
+        width: 160px;
+        height: 160px;
+      }
+    }
+
+    .modal-footer {
+      padding: 0.75rem !important;
+      gap: 0.5rem;
+
+      button {
+        flex: 1;
+      }
+    }
+  }
+}
+
 .avatar-tabs {
   display: flex;
   border-bottom: 1px solid var(--border-color);
@@ -488,7 +585,9 @@
   max-width: 1000px;
   height: 80vh;
   margin: 0 !important;
-  transition: width 0.3s ease, height 0.3s ease;
+  transition:
+    width 0.3s ease,
+    height 0.3s ease;
 
   &.minimized {
     width: 150px;
@@ -500,7 +599,7 @@
     z-index: 9999;
     margin: 0 !important;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-    
+
     .video-modal-content-modern {
       border-radius: 1.5rem;
       border: 2px solid rgba(255, 255, 255, 0.1);
@@ -531,7 +630,7 @@
     .local-video-container {
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       z-index: 100;
-      
+
       video {
         border-radius: inherit;
       }
@@ -539,7 +638,8 @@
 
     .controls-overlay {
       pointer-events: none;
-      button, .timer {
+      button,
+      .timer {
         pointer-events: auto;
       }
     }
@@ -549,7 +649,7 @@
 .minimized-wrapper {
   pointer-events: none !important;
   background: transparent !important;
-  
+
   .modal {
     pointer-events: none !important;
     display: block !important; // Để không bị flex center ép vị trí
@@ -561,7 +661,7 @@
     width: 100%;
     height: 100vh;
     border-radius: 0 !important;
-    
+
     &.minimized {
       width: 150px;
       min-width: 150px !important;

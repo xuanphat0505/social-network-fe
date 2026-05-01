@@ -1,28 +1,28 @@
-import { useContext, useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import { Button, Form } from "antd";
-import { RiCloseFill } from "react-icons/ri";
+import { useContext, useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import { Button, Form } from 'antd';
+import { RiCloseFill } from 'react-icons/ri';
 
-import useAxiosJWT from "@/config/axiosConfig";
-import { OpenContext } from "@/context/OpenContext";
-import { BASE_URL } from "@/config/utils";
-import QRCodeTab from "./QRCodeTab";
+import useAxiosJWT from '@/config/axiosConfig';
+import { OpenContext } from '@/context/OpenContext';
+import { BASE_URL } from '@/config/utils';
+import QRCodeTab from './QRCodeTab';
 
-import "./modal.scss";
+import './modal.scss';
 function ContactModal() {
   const user = useSelector((state) => state?.auth?.user);
   const getAxiosJWT = useAxiosJWT();
   const axiosJWT = getAxiosJWT();
   const { openContactModal, setOpenContactModal } = useContext(OpenContext);
   const [receiverInfo, setReceiverInfo] = useState({
-    username: "",
-    email: "",
-    code: "",
+    username: '',
+    email: '',
+    code: '',
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("info");
+  const [activeTab, setActiveTab] = useState('info');
   const [searchParams, setSearchParams] = useSearchParams();
 
   /**
@@ -34,30 +34,30 @@ function ContactModal() {
     if (!user) return;
 
     // Ưu tiên lấy từ URL param
-    const codeFromUrl = searchParams.get("add-friend");
+    const codeFromUrl = searchParams.get('add-friend');
     // Fallback lấy từ localStorage (được lưu trước khi redirect sang login)
-    const codeFromStorage = localStorage.getItem("pending_add_friend");
+    const codeFromStorage = localStorage.getItem('pending_add_friend');
     const friendCode = codeFromUrl || codeFromStorage;
 
     if (!friendCode) return;
 
     // Mở modal và chuyển sang tab nhập mã
     setOpenContactModal(true);
-    setActiveTab("code");
-    setReceiverInfo(prev => ({ ...prev, code: friendCode }));
+    setActiveTab('code');
+    setReceiverInfo((prev) => ({ ...prev, code: friendCode }));
 
     // Tự động gửi lời mời
     toast.info(`Đang tự động gửi lời mời kết bạn...`);
-    handleSendInvitation({ username: "", email: "", code: friendCode });
+    handleSendInvitation({ username: '', email: '', code: friendCode });
 
     // Dọn dẹp: xóa URL param và localStorage để tránh lặp lại khi refresh
     if (codeFromUrl) {
       const newParams = new URLSearchParams(searchParams);
-      newParams.delete("add-friend");
+      newParams.delete('add-friend');
       setSearchParams(newParams, { replace: true });
     }
     if (codeFromStorage) {
-      localStorage.removeItem("pending_add_friend");
+      localStorage.removeItem('pending_add_friend');
     }
   }, [user]); // Chỉ chạy khi user thay đổi (login/logout)
 
@@ -69,17 +69,13 @@ function ContactModal() {
   const handleSendInvitation = async (payload) => {
     setIsLoading(true);
     try {
-      const res = await axiosJWT.post(
-        `${BASE_URL}/contacts/add`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${user?.accessToken}`,
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
+      const res = await axiosJWT.post(`${BASE_URL}/contacts/add`, payload, {
+        headers: {
+          Authorization: `Bearer ${user?.accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
       const result = res.data;
       if (result.success) {
         toast.success(result.message);
@@ -96,18 +92,11 @@ function ContactModal() {
     e.preventDefault();
     handleSendInvitation(receiverInfo);
   };
-  
+
   return (
-    <div
-      className={`modal-container contact-modal-container ${
-        openContactModal ? "show" : ""
-      }`}
-    >
+    <div className={`modal-container contact-modal-container ${openContactModal ? 'show' : ''}`}>
       <div className="modal" onClick={() => setOpenContactModal(false)}>
-        <div
-          className="modal-centered contact-modal"
-          onClick={(e) => e.stopPropagation()}
-        >
+        <div className="modal-centered contact-modal" onClick={(e) => e.stopPropagation()}>
           <div className="modal-content contact-modal-content">
             <div className="modal-title">
               <h5 className="capitalize text-[18.75px]">add contacts</h5>
@@ -120,27 +109,27 @@ function ContactModal() {
             <div className="flex relative">
               <button
                 type="button"
-                onClick={() => setActiveTab("info")}
+                onClick={() => setActiveTab('info')}
                 className={`flex-1 py-2 text-sm font-medium transition-colors duration-200 hover:text-[#7269ef] ${
-                  activeTab === "info" ? "text-[#7269ef]" : ""
+                  activeTab === 'info' ? 'text-[#7269ef]' : ''
                 }`}
               >
                 Email / Username
               </button>
               <button
                 type="button"
-                onClick={() => setActiveTab("code")}
+                onClick={() => setActiveTab('code')}
                 className={`flex-1 py-2 text-sm font-medium transition-colors duration-200 hover:text-[#7269ef] ${
-                  activeTab === "code" ? "text-[#7269ef]" : ""
+                  activeTab === 'code' ? 'text-[#7269ef]' : ''
                 }`}
               >
                 User Code
               </button>
               <button
                 type="button"
-                onClick={() => setActiveTab("qr")}
+                onClick={() => setActiveTab('qr')}
                 className={`flex-1 py-2 text-sm font-medium transition-colors duration-200 hover:text-[#7269ef] ${
-                  activeTab === "qr" ? "text-[#7269ef]" : ""
+                  activeTab === 'qr' ? 'text-[#7269ef]' : ''
                 }`}
               >
                 QR Code
@@ -148,20 +137,20 @@ function ContactModal() {
               <span
                 className={`absolute bottom-0 h-[2px] bg-[#7269ef] transition-transform duration-300 ease-in-out`}
                 style={{
-                  width: "33.33%", // 3 tabs
+                  width: '33.33%', // 3 tabs
                   transform:
-                    activeTab === "info"
-                      ? "translateX(0%)"
-                      : activeTab === "code"
-                      ? "translateX(100%)"
-                      : "translateX(200%)",
+                    activeTab === 'info'
+                      ? 'translateX(0%)'
+                      : activeTab === 'code'
+                        ? 'translateX(100%)'
+                        : 'translateX(200%)',
                 }}
               />
             </div>
 
             <div className="modal-body p-6">
               <form className="w-full">
-                {activeTab === "code" && (
+                {activeTab === 'code' && (
                   <div className="modal-input-group">
                     <label htmlFor="code">Code</label>
                     <input
@@ -173,7 +162,7 @@ function ContactModal() {
                     ></input>
                   </div>
                 )}
-                {activeTab === "info" && (
+                {activeTab === 'info' && (
                   <>
                     <div className="modal-input-group">
                       <label htmlFor="email" className="">
@@ -199,31 +188,23 @@ function ContactModal() {
                     </div>
                   </>
                 )}
-                {activeTab === "qr" && (
+                {activeTab === 'qr' && (
                   <QRCodeTab
                     user={user}
                     onScanSuccess={(code) => {
-                      setReceiverInfo({ username: "", email: "", code });
-                      toast.info("QR Scanned! Sending invitation...");
-                      handleSendInvitation({ username: "", email: "", code });
+                      setReceiverInfo({ username: '', email: '', code });
+                      toast.info('QR Scanned! Sending invitation...');
+                      handleSendInvitation({ username: '', email: '', code });
                     }}
                   />
                 )}
               </form>
             </div>
             <div className="modal-footer">
-              <Button
-                type="text"
-                className="denied-btn"
-                onClick={() => setOpenContactModal(false)}
-              >
+              <Button type="text" className="denied-btn" onClick={() => setOpenContactModal(false)}>
                 Close
               </Button>
-              <Button
-                onClick={handleSubmit}
-                type="primary"
-                className="agree-btn"
-              >
+              <Button onClick={handleSubmit} type="primary" className="agree-btn">
                 Invite Contact
               </Button>
             </div>
