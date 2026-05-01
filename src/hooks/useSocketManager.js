@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { io } from "socket.io-client";
-import { toast } from "react-toastify";
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { io } from 'socket.io-client';
+import { toast } from 'react-toastify';
 
-import { SOCKET_URL } from "@/config/utils";
-import { loginSuccess } from "@/redux/authSlice";
-import ringTone from "@/assets/sounds/facebook_call.mp3";
-import { getMessageLayoutMeta } from "@/utils/messageLayout";
+import { SOCKET_URL } from '@/config/utils';
+import { loginSuccess } from '@/redux/authSlice';
+import ringTone from '@/assets/sounds/facebook_call.mp3';
+import { getMessageLayoutMeta } from '@/utils/messageLayout';
 
 export function useSocketManager({ axiosContext, openContext }) {
   const dispatch = useDispatch();
@@ -29,9 +29,9 @@ export function useSocketManager({ axiosContext, openContext }) {
   const { setOpenAudioCallModal, setOpenVideoCallModal } = openContext;
 
   const [incomingCall, setIncomingCall] = useState(null);
-  const [callState, setCallState] = useState("idle");
+  const [callState, setCallState] = useState('idle');
   const [callDuration, setCallDuration] = useState(0);
-  const [partnerId, setPartnerId] = useState("");
+  const [partnerId, setPartnerId] = useState('');
   const [blockedBy, setBlockedBy] = useState({});
   const [currentCallIsVideo, setCurrentCallIsVideo] = useState(false);
   const [broadcastMessage, setBroadcastMessage] = useState(null);
@@ -60,7 +60,7 @@ export function useSocketManager({ axiosContext, openContext }) {
     setOpenAudioCallModal(null);
     setOpenVideoCallModal(null);
     setIncomingCall(null);
-    setCallState("idle");
+    setCallState('idle');
     setCallDuration(0);
     setCurrentCallIsVideo(false);
     setLocalStream(null);
@@ -75,10 +75,10 @@ export function useSocketManager({ axiosContext, openContext }) {
         loginSuccess({
           ...user,
           notifications: [...(user?.notifications || []), notification._id],
-        }),
+        })
       );
     },
-    [dispatch, setNotifications, user],
+    [dispatch, setNotifications, user]
   );
 
   const handleSendMessage = useCallback(
@@ -86,30 +86,28 @@ export function useSocketManager({ axiosContext, openContext }) {
       if (message?.senderId?._id !== user?._id) {
         let muted = [];
         try {
-          const raw = localStorage.getItem("muted_users");
+          const raw = localStorage.getItem('muted_users');
           muted = raw ? JSON.parse(raw) : [];
         } catch {
           muted = [];
         }
 
-        const senderId = String(message?.senderId?._id || "");
+        const senderId = String(message?.senderId?._id || '');
         if (!muted.includes(senderId) && messageAudioRef.current) {
           try {
             messageAudioRef.current.currentTime = 0;
             messageAudioRef.current.play().catch((error) => {
-              console.log("Không thể phát âm thanh tin nhắn:", error);
+              console.log('Không thể phát âm thanh tin nhắn:', error);
             });
           } catch (error) {
-            console.log("Lỗi phát âm thanh tin nhắn:", error);
+            console.log('Lỗi phát âm thanh tin nhắn:', error);
           }
         }
 
         setChatList((prev) => {
           const existingChatIndex = prev.findIndex((chat) => {
             const partner =
-              chat.senderId._id === user?._id
-                ? chat.receiverId._id
-                : chat.senderId._id;
+              chat.senderId._id === user?._id ? chat.receiverId._id : chat.senderId._id;
             return String(partner) === String(senderId);
           });
 
@@ -146,7 +144,7 @@ export function useSocketManager({ axiosContext, openContext }) {
         String(message?.senderId?._id) === String(user?._id) ||
         String(message?.receiverId?._id) === String(user?._id);
 
-      const currentReceiverId = String(receiver?._id || receiver?.receiver?._id || "");
+      const currentReceiverId = String(receiver?._id || receiver?.receiver?._id || '');
       const isCurrentChat =
         receiver &&
         (currentReceiverId === String(message?.senderId?._id) ||
@@ -154,11 +152,7 @@ export function useSocketManager({ axiosContext, openContext }) {
 
       if (isMessageForCurrentUser && isCurrentChat) {
         setMessages((prev) => {
-          const showAvatar = getMessageLayoutMeta(
-            prev,
-            message,
-            prev.length,
-          ).showAvatar;
+          const showAvatar = getMessageLayoutMeta(prev, message, prev.length).showAvatar;
 
           return [...prev, { ...message, showAvatar }];
         });
@@ -173,17 +167,15 @@ export function useSocketManager({ axiosContext, openContext }) {
         }
       }
     },
-    [handleGetMessage, handleGetReceiver, receiver, setChatList, setMessages, user],
+    [handleGetMessage, handleGetReceiver, receiver, setChatList, setMessages, user]
   );
 
   const handleReactMessage = useCallback(
     (data) => {
       const { messageId, emoji } = data;
-      setMessages((prev) =>
-        prev.map((msg) => (msg._id === messageId ? { ...msg, emoji } : msg)),
-      );
+      setMessages((prev) => prev.map((msg) => (msg._id === messageId ? { ...msg, emoji } : msg)));
     },
-    [setMessages],
+    [setMessages]
   );
 
   const handleChangeStatus = useCallback(
@@ -199,8 +191,7 @@ export function useSocketManager({ axiosContext, openContext }) {
 
       setChatList((prev) =>
         prev.map((chat) => {
-          const partner =
-            chat.senderId._id === user?._id ? chat.receiverId : chat.senderId;
+          const partner = chat.senderId._id === user?._id ? chat.receiverId : chat.senderId;
           return String(partner._id) === String(userId)
             ? {
                 ...chat,
@@ -214,17 +205,17 @@ export function useSocketManager({ axiosContext, openContext }) {
                     : chat.receiverId,
               }
             : chat;
-        }),
+        })
       );
     },
-    [setChatList, setReceiver, user],
+    [setChatList, setReceiver, user]
   );
 
   const handleUpdateChatList = useCallback(
     ({ partnerId: partner, lastMessage, unreadCount }) => {
       setChatList((prev) => {
         const idx = prev.findIndex(
-          (c) => c.senderId._id === partner || c.receiverId._id === partner,
+          (c) => c.senderId._id === partner || c.receiverId._id === partner
         );
         if (idx !== -1) {
           return [
@@ -235,7 +226,7 @@ export function useSocketManager({ axiosContext, openContext }) {
         return [{ ...lastMessage, unreadCount }, ...prev];
       });
     },
-    [setChatList],
+    [setChatList]
   );
 
   const handleReadMessage = useCallback(
@@ -244,49 +235,43 @@ export function useSocketManager({ axiosContext, openContext }) {
       setChatList((prev) =>
         prev.map((chat) => {
           const partner =
-            chat.senderId._id === message?.senderId?._id
-              ? chat.senderId._id
-              : chat.receiverId._id;
+            chat.senderId._id === message?.senderId?._id ? chat.senderId._id : chat.receiverId._id;
           return partner === message?.senderId?._id ? { ...chat, unreadCount: 0 } : chat;
-        }),
+        })
       );
     },
-    [setChatList, setUnreadMessages],
+    [setChatList, setUnreadMessages]
   );
 
   const handleRevokeMessage = useCallback(
     ({ messageId, isRevoked }) => {
       setMessages((prevMessages) =>
-        prevMessages.map((msg) =>
-          msg._id === messageId ? { ...msg, isRevoked } : msg,
-        ),
+        prevMessages.map((msg) => (msg._id === messageId ? { ...msg, isRevoked } : msg))
       );
     },
-    [setMessages],
+    [setMessages]
   );
 
   const handlePinnedMessage = useCallback(
     (data) => {
       setMessages((prev) =>
-        prev.map((msg) =>
-          msg._id === data._id ? { ...msg, isPinned: data.isPinned } : msg,
-        ),
+        prev.map((msg) => (msg._id === data._id ? { ...msg, isPinned: data.isPinned } : msg))
       );
     },
-    [setMessages],
+    [setMessages]
   );
 
   const handleReceiveCall = useCallback(
     ({ from, signalData, isVideo, start }) => {
       if (peerRef.current) return;
       setIncomingCall({ from, signalData, isVideo, start });
-      setCallState("incoming");
+      setCallState('incoming');
       setPartnerId(from._id);
       setCurrentCallIsVideo(isVideo);
       if (isVideo) setOpenVideoCallModal(from);
       else setOpenAudioCallModal(from);
     },
-    [setOpenAudioCallModal, setOpenVideoCallModal],
+    [setOpenAudioCallModal, setOpenVideoCallModal]
   );
 
   const handleAnswer = useCallback(async ({ signalData }) => {
@@ -295,11 +280,9 @@ export function useSocketManager({ axiosContext, openContext }) {
       callTimeoutRef.current = null;
     }
     if (peerRef.current) {
-      await peerRef.current.setRemoteDescription(
-        new RTCSessionDescription(signalData),
-      );
+      await peerRef.current.setRemoteDescription(new RTCSessionDescription(signalData));
     }
-    setCallState("inCall");
+    setCallState('inCall');
     setCallDuration(0);
   }, []);
 
@@ -309,7 +292,7 @@ export function useSocketManager({ axiosContext, openContext }) {
         await peerRef.current.addIceCandidate(new RTCIceCandidate(candidate));
       }
     } catch (error) {
-      return toast.error("❌ Error adding ICE candidate:", error);
+      return toast.error('❌ Error adding ICE candidate:', error);
     }
   }, []);
 
@@ -317,7 +300,7 @@ export function useSocketManager({ axiosContext, openContext }) {
     async ({ _id, username, avatar }, isVideo = true) => {
       try {
         if (peerRef.current) return;
-        setCallState("outgoing");
+        setCallState('outgoing');
         setPartnerId(_id);
         setCurrentCallIsVideo(isVideo);
         if (isVideo) setOpenVideoCallModal({ _id, username, avatar });
@@ -328,14 +311,16 @@ export function useSocketManager({ axiosContext, openContext }) {
         setLocalStream(stream);
         if (localVideoRef.current) localVideoRef.current.srcObject = stream;
 
-        const peer = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+        const peer = new RTCPeerConnection({
+          iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
+        });
         peerRef.current = peer;
         if (peer.getSenders().length === 0) {
           stream.getTracks().forEach((track) => peer.addTrack(track, stream));
         }
         peer.onicecandidate = (event) => {
           if (event.candidate) {
-            socket.current.emit("iceCandidate", {
+            socket.current.emit('iceCandidate', {
               to: _id,
               candidate: event.candidate,
             });
@@ -351,17 +336,17 @@ export function useSocketManager({ axiosContext, openContext }) {
         const offer = await peer.createOffer();
         await peer.setLocalDescription(offer);
         const start = Date.now();
-        socket.current.emit("callUser", {
+        socket.current.emit('callUser', {
           to: _id,
           from: { _id: user._id, username: user.username, avatar: user.avatar },
           signalData: offer,
-          type: "offer",
+          type: 'offer',
           isVideo,
           start,
         });
 
         callTimeoutRef.current = setTimeout(() => {
-          socket.current.emit("missedCall", {
+          socket.current.emit('missedCall', {
             to: _id,
             from: { _id: user._id, username: user.username, avatar: user.avatar },
             isVideo,
@@ -371,11 +356,11 @@ export function useSocketManager({ axiosContext, openContext }) {
 
         setCallDuration(0);
       } catch (error) {
-        console.error("❌ startCall error:", error);
-        toast.error("❌ startCall error: " + error.message);
+        console.error('❌ startCall error:', error);
+        toast.error('❌ startCall error: ' + error.message);
       }
     },
-    [cleanupCall, setOpenAudioCallModal, setOpenVideoCallModal, user],
+    [cleanupCall, setOpenAudioCallModal, setOpenVideoCallModal, user]
   );
 
   const acceptCall = useCallback(async () => {
@@ -388,14 +373,16 @@ export function useSocketManager({ axiosContext, openContext }) {
       setLocalStream(stream);
       if (localVideoRef.current) localVideoRef.current.srcObject = stream;
 
-      const peer = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+      const peer = new RTCPeerConnection({
+        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
+      });
       peerRef.current = peer;
       if (peer.getSenders().length === 0) {
         stream.getTracks().forEach((track) => peer.addTrack(track, stream));
       }
       peer.onicecandidate = (event) => {
         if (event.candidate) {
-          socket.current.emit("iceCandidate", {
+          socket.current.emit('iceCandidate', {
             to: from._id,
             candidate: event.candidate,
           });
@@ -411,32 +398,32 @@ export function useSocketManager({ axiosContext, openContext }) {
       await peer.setRemoteDescription(new RTCSessionDescription(signalData));
       const answer = await peer.createAnswer();
       await peer.setLocalDescription(answer);
-      socket.current.emit("answerCall", {
+      socket.current.emit('answerCall', {
         to: from._id,
         signalData: answer,
-        type: "answer",
+        type: 'answer',
       });
       setIncomingCall(null);
-      setCallState("inCall");
+      setCallState('inCall');
       setCallDuration(start ? Math.floor((Date.now() - start) / 1000) : 0);
     } catch (error) {
-      console.error("❌ acceptCall error:", error);
-      toast.error("❌ acceptCall error: " + error.message);
+      console.error('❌ acceptCall error:', error);
+      toast.error('❌ acceptCall error: ' + error.message);
     }
   }, [incomingCall]);
 
   const endCall = useCallback(() => {
     const otherId = incomingCall ? incomingCall.from._id : partnerId;
 
-    if (otherId && callState === "inCall") {
-      socket.current.emit("endCall", {
+    if (otherId && callState === 'inCall') {
+      socket.current.emit('endCall', {
         to: otherId,
         from: { _id: user._id, username: user.username, avatar: user.avatar },
         duration: callDuration,
         isVideo: currentCallIsVideo,
       });
     } else if (otherId) {
-      socket.current.emit("endCall", { to: otherId });
+      socket.current.emit('endCall', { to: otherId });
     }
 
     cleanupCall();
@@ -448,7 +435,7 @@ export function useSocketManager({ axiosContext, openContext }) {
 
   useEffect(() => {
     let interval;
-    if (callState === "inCall") {
+    if (callState === 'inCall') {
       interval = setInterval(() => setCallDuration((prev) => prev + 1), 1000);
     }
     return () => clearInterval(interval);
@@ -459,7 +446,7 @@ export function useSocketManager({ axiosContext, openContext }) {
 
     socket.current = io(SOCKET_URL, {
       withCredentials: true,
-      transports: ["websocket"],
+      transports: ['websocket'],
     });
 
     return () => {
@@ -473,8 +460,8 @@ export function useSocketManager({ axiosContext, openContext }) {
 
     const socketInstance = socket.current;
     const onConnect = () => {
-      socketInstance.emit("join", user._id);
-      dispatch(loginSuccess({ ...user, status: "available" }));
+      socketInstance.emit('join', user._id);
+      dispatch(loginSuccess({ ...user, status: 'available' }));
     };
 
     const onTyping = ({ senderId }) => setTypingUserId(senderId);
@@ -486,17 +473,14 @@ export function useSocketManager({ axiosContext, openContext }) {
       setFriendList((prev) => {
         const exists = prev.some((f) => f._id === friend._id);
         if (exists) {
-          return friend.status === "available"
-            ? prev.map((f) =>
-                f._id === friend._id ? { ...f, status: friend.status } : f,
-              )
+          return friend.status === 'available'
+            ? prev.map((f) => (f._id === friend._id ? { ...f, status: friend.status } : f))
             : prev.filter((f) => f._id !== friend._id);
         }
-        return friend.status === "available" ? [...prev, friend] : prev;
+        return friend.status === 'available' ? [...prev, friend] : prev;
       });
     };
-    const onBlockedByUser = ({ userId }) =>
-      setBlockedBy((prev) => ({ ...prev, [userId]: true }));
+    const onBlockedByUser = ({ userId }) => setBlockedBy((prev) => ({ ...prev, [userId]: true }));
     const onUnblockedByUser = ({ userId }) =>
       setBlockedBy((prev) => {
         const updated = { ...prev };
@@ -505,7 +489,7 @@ export function useSocketManager({ axiosContext, openContext }) {
       });
     const onBroadcastNotification = (data) => setBroadcastMessage(data);
     const onMissedCall = () => {
-      setCallState("idle");
+      setCallState('idle');
       setOpenVideoCallModal(null);
       setOpenAudioCallModal(null);
     };
@@ -515,60 +499,60 @@ export function useSocketManager({ axiosContext, openContext }) {
         loginSuccess({
           ...user,
           notifications: [...(user?.notifications || []), noti._id],
-        }),
+        })
       );
     };
 
-    socketInstance.on("connect", onConnect);
-    socketInstance.on("addedContact", handleAddedContact);
-    socketInstance.on("contactAccepted", handleGetContacts);
-    socketInstance.on("contactDeleted", handleGetContacts);
-    socketInstance.on("sendMessage", handleSendMessage);
-    socketInstance.on("reactMessage", handleReactMessage);
-    socketInstance.on("typing", onTyping);
-    socketInstance.on("stopTyping", onStopTyping);
-    socketInstance.on("unreadMessage", onUnreadMessage);
-    socketInstance.on("readMessage", handleReadMessage);
-    socketInstance.on("revokeMessage", handleRevokeMessage);
-    socketInstance.on("pinnedMessage", handlePinnedMessage);
-    socketInstance.on("changeStatus", handleChangeStatus);
-    socketInstance.on("updateChatList", handleUpdateChatList);
-    socketInstance.on("friendOnline", onFriendOnline);
-    socketInstance.on("blockedByUser", onBlockedByUser);
-    socketInstance.on("unblockedByUser", onUnblockedByUser);
-    socketInstance.on("broadcastNotification", onBroadcastNotification);
-    socketInstance.on("callUser", handleReceiveCall);
-    socketInstance.on("answerCall", handleAnswer);
-    socketInstance.on("iceCandidate", handleNewICE);
-    socketInstance.on("missedCall", onMissedCall);
-    socketInstance.on("missedCallNotification", onMissedCallNotification);
-    socketInstance.on("callEnded", handleCallEnded);
+    socketInstance.on('connect', onConnect);
+    socketInstance.on('addedContact', handleAddedContact);
+    socketInstance.on('contactAccepted', handleGetContacts);
+    socketInstance.on('contactDeleted', handleGetContacts);
+    socketInstance.on('sendMessage', handleSendMessage);
+    socketInstance.on('reactMessage', handleReactMessage);
+    socketInstance.on('typing', onTyping);
+    socketInstance.on('stopTyping', onStopTyping);
+    socketInstance.on('unreadMessage', onUnreadMessage);
+    socketInstance.on('readMessage', handleReadMessage);
+    socketInstance.on('revokeMessage', handleRevokeMessage);
+    socketInstance.on('pinnedMessage', handlePinnedMessage);
+    socketInstance.on('changeStatus', handleChangeStatus);
+    socketInstance.on('updateChatList', handleUpdateChatList);
+    socketInstance.on('friendOnline', onFriendOnline);
+    socketInstance.on('blockedByUser', onBlockedByUser);
+    socketInstance.on('unblockedByUser', onUnblockedByUser);
+    socketInstance.on('broadcastNotification', onBroadcastNotification);
+    socketInstance.on('callUser', handleReceiveCall);
+    socketInstance.on('answerCall', handleAnswer);
+    socketInstance.on('iceCandidate', handleNewICE);
+    socketInstance.on('missedCall', onMissedCall);
+    socketInstance.on('missedCallNotification', onMissedCallNotification);
+    socketInstance.on('callEnded', handleCallEnded);
 
     return () => {
-      socketInstance.off("connect", onConnect);
-      socketInstance.off("addedContact", handleAddedContact);
-      socketInstance.off("contactAccepted", handleGetContacts);
-      socketInstance.off("contactDeleted", handleGetContacts);
-      socketInstance.off("sendMessage", handleSendMessage);
-      socketInstance.off("reactMessage", handleReactMessage);
-      socketInstance.off("typing", onTyping);
-      socketInstance.off("stopTyping", onStopTyping);
-      socketInstance.off("unreadMessage", onUnreadMessage);
-      socketInstance.off("readMessage", handleReadMessage);
-      socketInstance.off("revokeMessage", handleRevokeMessage);
-      socketInstance.off("pinnedMessage", handlePinnedMessage);
-      socketInstance.off("changeStatus", handleChangeStatus);
-      socketInstance.off("updateChatList", handleUpdateChatList);
-      socketInstance.off("friendOnline", onFriendOnline);
-      socketInstance.off("blockedByUser", onBlockedByUser);
-      socketInstance.off("unblockedByUser", onUnblockedByUser);
-      socketInstance.off("broadcastNotification", onBroadcastNotification);
-      socketInstance.off("callUser", handleReceiveCall);
-      socketInstance.off("answerCall", handleAnswer);
-      socketInstance.off("iceCandidate", handleNewICE);
-      socketInstance.off("missedCall", onMissedCall);
-      socketInstance.off("missedCallNotification", onMissedCallNotification);
-      socketInstance.off("callEnded", handleCallEnded);
+      socketInstance.off('connect', onConnect);
+      socketInstance.off('addedContact', handleAddedContact);
+      socketInstance.off('contactAccepted', handleGetContacts);
+      socketInstance.off('contactDeleted', handleGetContacts);
+      socketInstance.off('sendMessage', handleSendMessage);
+      socketInstance.off('reactMessage', handleReactMessage);
+      socketInstance.off('typing', onTyping);
+      socketInstance.off('stopTyping', onStopTyping);
+      socketInstance.off('unreadMessage', onUnreadMessage);
+      socketInstance.off('readMessage', handleReadMessage);
+      socketInstance.off('revokeMessage', handleRevokeMessage);
+      socketInstance.off('pinnedMessage', handlePinnedMessage);
+      socketInstance.off('changeStatus', handleChangeStatus);
+      socketInstance.off('updateChatList', handleUpdateChatList);
+      socketInstance.off('friendOnline', onFriendOnline);
+      socketInstance.off('blockedByUser', onBlockedByUser);
+      socketInstance.off('unblockedByUser', onUnblockedByUser);
+      socketInstance.off('broadcastNotification', onBroadcastNotification);
+      socketInstance.off('callUser', handleReceiveCall);
+      socketInstance.off('answerCall', handleAnswer);
+      socketInstance.off('iceCandidate', handleNewICE);
+      socketInstance.off('missedCall', onMissedCall);
+      socketInstance.off('missedCallNotification', onMissedCallNotification);
+      socketInstance.off('callEnded', handleCallEnded);
     };
   }, [
     dispatch,
@@ -596,10 +580,10 @@ export function useSocketManager({ axiosContext, openContext }) {
   ]);
 
   useEffect(() => {
-    if (callState === "outgoing" || callState === "incoming") {
+    if (callState === 'outgoing' || callState === 'incoming') {
       audioRef.current = new Audio(ringTone);
       audioRef.current.loop = true;
-      audioRef.current.play().catch((err) => console.error("Autoplay blocked:", err));
+      audioRef.current.play().catch((err) => console.error('Autoplay blocked:', err));
     } else if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;

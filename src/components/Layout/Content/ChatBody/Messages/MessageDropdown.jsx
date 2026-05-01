@@ -10,7 +10,7 @@ const MessageDropdown = memo(({
   handleDropdownToggle, 
   handleDeleteMessage, 
   handlePinnedMessage, 
-  setOpenRevokeMessageModal 
+  setOpenRevokeMessageModal,
 }) => {
   const isDeleted = Array.isArray(message.deletedBy) && message.deletedBy.includes(user?._id);
   const showBasicMenu = message.isRevoked || isDeleted;
@@ -21,6 +21,7 @@ const MessageDropdown = memo(({
       className="dropdown"
       interactive={true}
       arrow={false}
+      onClickOutside={() => handleDropdownToggle(null)}
       content={
         showBasicMenu ? (
           <div className="dropdown-menu show">
@@ -65,7 +66,10 @@ const MessageDropdown = memo(({
     >
       <Link
         className="text-secondary-color text-[20px] p-1"
-        onClick={() => handleDropdownToggle(message._id)}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleDropdownToggle(dropdownMenu === message._id ? null : message._id);
+        }}
       >
         <i><RiMore2Fill /></i>
       </Link>

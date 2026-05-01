@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo } from 'react';
 
 export function useSocketProviderValue(axiosContext, socketState) {
   return useMemo(
@@ -21,6 +21,6 @@ export function useSocketProviderValue(axiosContext, socketState) {
       setIsVideoMinimized: socketState.setIsVideoMinimized,
       clearBroadcast: socketState.clearBroadcast,
     }),
-    [axiosContext?.notifications, socketState],
+    [axiosContext?.notifications, socketState]
   );
 }
