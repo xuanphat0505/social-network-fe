@@ -17,40 +17,34 @@ function ContactModal() {
   const axiosJWT = getAxiosJWT();
   const { openContactModal, setOpenContactModal } = useContext(OpenContext);
   const [receiverInfo, setReceiverInfo] = useState({
-    username: '',
-    email: '',
     code: '',
   });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('info');
   const [searchParams, setSearchParams] = useSearchParams();
 
   /**
    * Tự động xử lý khi có mã kết bạn:
-   * - Ưu tiên đọc từ URL param (?add-friend=CODE) - trường hợp đã login sẵn
-   * - Fallback đọc từ localStorage (pending_add_friend) - trường hợp vừa login xong
    */
   useEffect(() => {
     if (!user) return;
 
-    // Ưu tiên lấy từ URL param
     const codeFromUrl = searchParams.get('add-friend');
-    // Fallback lấy từ localStorage (được lưu trước khi redirect sang login)
     const codeFromStorage = localStorage.getItem('pending_add_friend');
     const friendCode = codeFromUrl || codeFromStorage;
 
     if (!friendCode) return;
 
-    // Mở modal và chuyển sang tab nhập mã
     setOpenContactModal(true);
     setActiveTab('code');
-    setReceiverInfo((prev) => ({ ...prev, code: friendCode }));
+    setReceiverInfo({ code: friendCode });
 
-    // Tự động gửi lời mời
     toast.info(`Đang tự động gửi lời mời kết bạn...`);
-    handleSendInvitation({ username: '', email: '', code: friendCode });
+    handleSendInvitation({ code: friendCode });
 
-    // Dọn dẹp: xóa URL param và localStorage để tránh lặp lại khi refresh
     if (codeFromUrl) {
       const newParams = new URLSearchParams(searchParams);
       newParams.delete('add-friend');
@@ -59,7 +53,36 @@ function ContactModal() {
     if (codeFromStorage) {
       localStorage.removeItem('pending_add_friend');
     }
-  }, [user]); // Chỉ chạy khi user thay đổi (login/logout)
+  }, [user]);
+
+  /**
+   * Xử lý Smart Search: Tự động tìm kiếm khi người dùng nhập
+   */
+  useEffect(() => {
+    if (activeTab !== 'info' || !searchTerm.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    const delayDebounceFn = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const res = await axiosJWT.get(`${BASE_URL}/user/search-users?keyword=${searchTerm}`, {
+          headers: { Authorization: `Bearer ${user?.accessToken}` },
+          withCredentials: true,
+        });
+        if (res.data.success) {
+          setSearchResults(res.data.data);
+        }
+      } catch (error) {
+        console.error('Search error:', error);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm, activeTab]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -90,7 +113,9 @@ function ContactModal() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    handleSendInvitation(receiverInfo);
+    if (activeTab === 'code') {
+      handleSendInvitation({ code: receiverInfo.code });
+    }
   };
 
   return (
@@ -114,7 +139,7 @@ function ContactModal() {
                   activeTab === 'info' ? 'text-[#7269ef]' : ''
                 }`}
               >
-                Email / Username
+                Smart Search
               </button>
               <button
                 type="button"
@@ -137,7 +162,7 @@ function ContactModal() {
               <span
                 className={`absolute bottom-0 h-[2px] bg-[#7269ef] transition-transform duration-300 ease-in-out`}
                 style={{
-                  width: '33.33%', // 3 tabs
+                  width: '33.33%',
                   transform:
                     activeTab === 'info'
                       ? 'translateX(0%)'
@@ -149,7 +174,79 @@ function ContactModal() {
             </div>
 
             <div className="modal-body p-6">
-              <form className="w-full">
+              <form className="w-full" onSubmit={handleSubmit}>
+                {activeTab === 'info' && (
+                  <div className="modal-input-group">
+                    <label htmlFor="search">Username or Email</label>
+                    <input
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      type="text"
+                      id="search"
+                      value={searchTerm}
+                      placeholder="Enter username or email"
+                      autoComplete="off"
+                    ></input>
+
+                    {/* Results Area */}
+                    <div className="mt-4 max-h-[250px] overflow-y-auto">
+                      {isSearching ? (
+                        <p className="text-center text-sm text-secondary-color py-4">Searching...</p>
+                      ) : searchResults.length > 0 ? (
+                        <div className="flex flex-col gap-3">
+                          {searchResults.map((result) => (
+                            <div
+                              key={result._id}
+                              className="flex items-center justify-between p-3 rounded-lg bg-card-bg-color-2 hover:bg-[var(--hover-dropdown-btn-bg-color)] transition-all duration-200 border border-transparent hover:border-[#7269ef]/20"
+                            >
+                              <div className="flex items-center gap-3">
+                                <img
+                                  src={result.avatar}
+                                  alt={result.username}
+                                  className="w-10 h-10 rounded-full object-cover border border-border-color"
+                                />
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-semibold text-heading-color">
+                                    {result.username}
+                                  </span>
+                                  <span className="text-xs text-secondary-color">
+                                    {result.email}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                {result.isFriend ? (
+                                  <span className="text-xs font-medium text-green-500 bg-green-500/10 px-3 py-1 rounded-full">
+                                    Friend
+                                  </span>
+                                ) : result.isPending ? (
+                                  <span className="text-xs font-medium text-orange-500 bg-orange-500/10 px-3 py-1 rounded-full">
+                                    Pending
+                                  </span>
+                                ) : (
+                                  <Button
+                                    type="primary"
+                                    size="small"
+                                    className="bg-[#7269ef] hover:bg-[#6159cb] border-none text-xs px-4"
+                                    onClick={() => handleSendInvitation({ code: result.code })}
+                                    loading={isLoading}
+                                  >
+                                    Add
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        searchTerm && (
+                          <p className="text-center text-sm text-secondary-color py-4">
+                            No users found
+                          </p>
+                        )
+                      )}
+                    </div>
+                  </div>
+                )}
                 {activeTab === 'code' && (
                   <div className="modal-input-group">
                     <label htmlFor="code">Code</label>
@@ -162,39 +259,13 @@ function ContactModal() {
                     ></input>
                   </div>
                 )}
-                {activeTab === 'info' && (
-                  <>
-                    <div className="modal-input-group">
-                      <label htmlFor="email" className="">
-                        Email
-                      </label>
-                      <input
-                        onChange={handleChange}
-                        type="email"
-                        id="email"
-                        placeholder="Enter email"
-                      ></input>
-                    </div>
-                    <div className="modal-input-group">
-                      <label htmlFor="username" className="">
-                        Username
-                      </label>
-                      <input
-                        onChange={handleChange}
-                        type="text"
-                        id="username"
-                        placeholder="Enter username"
-                      ></input>
-                    </div>
-                  </>
-                )}
                 {activeTab === 'qr' && (
                   <QRCodeTab
                     user={user}
                     onScanSuccess={(code) => {
-                      setReceiverInfo({ username: '', email: '', code });
+                      setReceiverInfo({ code });
                       toast.info('QR Scanned! Sending invitation...');
-                      handleSendInvitation({ username: '', email: '', code });
+                      handleSendInvitation({ code });
                     }}
                   />
                 )}
@@ -204,9 +275,11 @@ function ContactModal() {
               <Button type="text" className="denied-btn" onClick={() => setOpenContactModal(false)}>
                 Close
               </Button>
-              <Button onClick={handleSubmit} type="primary" className="agree-btn">
-                Invite Contact
-              </Button>
+              {activeTab === 'code' && (
+                <Button onClick={handleSubmit} type="primary" className="agree-btn">
+                  Invite Contact
+                </Button>
+              )}
             </div>
           </div>
         </div>
