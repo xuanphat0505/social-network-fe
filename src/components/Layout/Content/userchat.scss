@@ -134,6 +134,13 @@
                     border-left: 5px solid #7269ef;
                     border-top: 5px solid #7269ef;
                   }
+                  &.sending {
+                    opacity: 0.6;
+                    pointer-events: none;
+                    &::before {
+                      opacity: 0.6;
+                    }
+                  }
                   p {
                     margin-bottom: 0;
                   }

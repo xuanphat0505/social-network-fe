@@ -42,62 +42,82 @@ function UserchatFooter({ receiverId }) {
     e.preventDefault();
 
     if (!content.trim() && selectedFiles.length === 0) {
-      return toast.error('Vui lòng nhập tin nhắn hoặc chọn file');
+      return toast.error("Vui lòng nhập tin nhắn hoặc chọn file");
     }
 
-    setIsLoading(true);
+    const tempId = `temp-${Date.now()}`;
+    const optimisticMessage = {
+      _id: tempId,
+      senderId: {
+        _id: user._id,
+        username: user.username,
+        avatar: user.avatar,
+      },
+      receiverId: {
+        _id: receiverId,
+      },
+      content: content,
+      type: selectedFiles.length > 0 ? (selectedFiles.every(f => f.type.startsWith('image/')) ? 'image' : 'file') : 'text',
+      files: selectedFiles.map(f => ({
+        originalName: f.name,
+        fileUrl: f.preview || '', // Preview URL for images
+        type: f.type.startsWith('image/') ? 'image' : 'file',
+      })),
+      createdAt: new Date().toISOString(),
+      status: "sending",
+      isOptimistic: true,
+    };
+
+    // 1. Cập nhật UI ngay lập tức (Optimistic Update)
+    setMessages((prev) => {
+      const showAvatar = prev.length === 0 || prev[prev.length - 1].senderId._id !== user._id;
+      return [...prev, { ...optimisticMessage, showAvatar }];
+    });
+
+    // 2. Cập nhật Chat List ngay lập tức
+    setChatList((prev) => {
+      const idx = prev.findIndex((chat) => {
+        const partner = chat.senderId._id === user._id ? chat.receiverId._id : chat.senderId._id;
+        return String(partner) === String(receiverId);
+      });
+      const next = [...prev];
+      if (idx > -1) {
+        const updatedChat = { ...next[idx], content: content || (selectedFiles.length > 0 ? "Đã gửi tệp đính kèm" : ""), createdAt: optimisticMessage.createdAt };
+        next.splice(idx, 1);
+        return [updatedChat, ...next];
+      }
+      return prev;
+    });
+
+    // 3. Clear input ngay lập tức
+    setContent("");
+    setSelectedFiles([]);
+    setShowEmojiPicker(false);
+    setIsLoading(false); // Không dùng loading state chặn UI nữa
+
     try {
       const formData = new FormData();
-      formData.append('content', content);
-
-      // ✅ key phải trùng "files" (số nhiều)
+      formData.append("content", content);
       selectedFiles.forEach((f) => {
-        formData.append('files', f.file); // gửi object File gốc
+        formData.append("files", f.file);
       });
 
-      const res = await axiosJWT.post(`${BASE_URL}/messages/send/${receiverId}`, formData, {
+      await axiosJWT.post(`${BASE_URL}/messages/send/${receiverId}`, formData, {
         headers: {
           Authorization: `Bearer ${user?.accessToken}`,
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
         withCredentials: true,
       });
 
-      const result = res.data;
-      if (result.success) {
-        // cập nhật messages
-        setMessages((prev) => {
-          if (prev.length > 0) {
-            const lastMsg = prev[prev.length - 1];
-            if (lastMsg.senderId._id === result.data.senderId._id) {
-              const updated = [...prev];
-              updated[updated.length - 1] = { ...lastMsg, showAvatar: false };
-              return [...updated, { ...result.data, showAvatar: true }];
-            }
-          }
-          return [...prev, { ...result.data, showAvatar: true }];
-        });
-
-        // cập nhật chat list
-        setChatList((prev) => {
-          const partnerIdOf = (m) =>
-            m.senderId._id === user?._id ? m.receiverId._id : m.senderId._id;
-          const partnerId = partnerIdOf(result.data);
-          const idx = prev.findIndex((m) => partnerIdOf(m) === partnerId);
-          const next = [...prev];
-          if (idx > -1) next.splice(idx, 1);
-          return [result.data, ...next];
-        });
-        setShowEmojiPicker(false);
-        setContent('');
-        setSelectedFiles([]);
-      }
+      // Không setMessages ở đây nữa, Socket sẽ đảm nhận việc nhận tin nhắn thật và thay thế tin nhắn tạm
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Lỗi gửi tin');
-    } finally {
-      setIsLoading(false);
+      toast.error(error.response?.data?.message || "Lỗi gửi tin");
+      // Xóa tin nhắn tạm nếu gửi lỗi
+      setMessages((prev) => prev.filter((m) => m._id !== tempId));
     }
   };
+
 
   const handleFileSelect = (e) => {
     const MAX_SIZE_BYTES = 5 * 1024 * 1024;

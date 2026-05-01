@@ -25,22 +25,23 @@ createRoot(document.getElementById("root")).render(
   <Provider store={store}>
     <PersistGate persistor={persistor} loading={null}>
       <StrictMode>
-        <NavLinkProvider>
-          <OpenProvider>
-            <ThemeProvider>
-              <IsEmptyProvider>
-                <AxiosProvider>
-                  <SocketProvider>
-                    <BrowserRouter>
+        <BrowserRouter>
+          <NavLinkProvider>
+            <OpenProvider>
+              <ThemeProvider>
+                <IsEmptyProvider>
+                  <AxiosProvider>
+                    <SocketProvider>
                       <App />
-                    </BrowserRouter>
-                  </SocketProvider>
-                </AxiosProvider>
-              </IsEmptyProvider>
-            </ThemeProvider>
-          </OpenProvider>
-        </NavLinkProvider>
+                    </SocketProvider>
+                  </AxiosProvider>
+                </IsEmptyProvider>
+              </ThemeProvider>
+            </OpenProvider>
+          </NavLinkProvider>
+        </BrowserRouter>
       </StrictMode>
     </PersistGate>
   </Provider>
 );
+
