@@ -80,6 +80,7 @@ export function AxiosProvider({ children }) {
 
   const [typingUserId, setTypingUserId] = useState(null);
   const didRunRef = useRef(false);
+  const lastLoadedUserIdRef = useRef(null);
 
   // --- Specialized Functions (Coordinating between multiple states) ---
 
@@ -328,12 +329,16 @@ export function AxiosProvider({ children }) {
 
   useEffect(() => {
     if (user) {
+      didRunRef.current = false;
+      lastLoadedUserIdRef.current = null;
       handleGetChatList();
       handleGetContacts();
       handleGetNotifications();
       handleGetUnreadMessages();
       handleGetListFriend();
     } else {
+      didRunRef.current = false;
+      lastLoadedUserIdRef.current = null;
       setContacts([]);
       setMessages([]);
       setChatList([]);
@@ -345,21 +350,24 @@ export function AxiosProvider({ children }) {
   }, [user]);
 
   useEffect(() => {
-    if (!didRunRef.current && chatList.length > 0 && user?._id) {
-      const isMobile = window.innerWidth <= 768;
-      const firstChat = chatList[0];
-      const partner =
-        firstChat.senderId._id === user._id
-          ? firstChat.receiverId
-          : firstChat.senderId;
-      if (!isMobile) {
-        setOpenChatBox(partner._id);
-        handleGetMessage(partner._id, true);
-      }
-      handleGetReceiver(partner._id);
-      didRunRef.current = true;
+    if (!chatList.length || !user?._id) return;
+
+    const firstChat = chatList[0];
+    const partner =
+      firstChat.senderId._id === user._id
+        ? firstChat.receiverId
+        : firstChat.senderId;
+
+    if (lastLoadedUserIdRef.current === partner._id) return;
+
+    const isMobile = window.innerWidth <= 768;
+    if (!isMobile) {
+      setOpenChatBox(partner._id);
+      handleGetMessage(partner._id, true);
     }
-  }, [chatList, user]);
+    handleGetReceiver(partner._id);
+    lastLoadedUserIdRef.current = partner._id;
+  }, [chatList, handleGetMessage, handleGetReceiver, setOpenChatBox, user]);
 
   return (
     <AxiosContext.Provider

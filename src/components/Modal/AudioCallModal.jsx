@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { RiCloseFill, RiPhoneFill } from 'react-icons/ri';
 
 import { OpenContext } from '@/context/OpenContext';
@@ -6,8 +6,14 @@ import { SocketContext } from '@/context/SocketContext';
 
 import './modal.scss';
 function AudioCallModal() {
-  const { acceptCall, endCall, callState, callDuration } = useContext(SocketContext);
+  const { acceptCall, endCall, callState, callDuration, remoteVideoRef, remoteStream } =
+    useContext(SocketContext);
   const { openAudioCallModal, setOpenAudioCallModal } = useContext(OpenContext);
+  useEffect(() => {
+    if (remoteVideoRef.current && remoteStream) {
+      remoteVideoRef.current.srcObject = remoteStream;
+    }
+  }, [remoteVideoRef, remoteStream, openAudioCallModal]);
 
   if (!openAudioCallModal) return null;
   const formatTime = (sec) => {
@@ -35,6 +41,7 @@ function AudioCallModal() {
       >
         <div className="modal-centered audio-modal" onClick={(e) => e.stopPropagation()}>
           <div className="modal-content audio-modal-content relative">
+            <audio ref={remoteVideoRef} autoPlay />
             <div className="p-12 text-center">
               <div className="w-24 h-24 mb-6 mx-auto">
                 <img
