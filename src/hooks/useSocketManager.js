@@ -508,10 +508,9 @@ export function useSocketManager({ axiosContext, openContext }) {
       });
     const onBroadcastNotification = (data) => setBroadcastMessage(data);
     const onMissedCall = () => {
-      setCallState('idle');
-      setOpenVideoCallModal(null);
-      setOpenAudioCallModal(null);
+      cleanupCall();
     };
+
     const onMissedCallNotification = (noti) => {
       setNotifications((prev) => [noti, ...prev]);
       dispatch(
