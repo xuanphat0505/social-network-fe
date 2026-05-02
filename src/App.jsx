@@ -33,11 +33,17 @@ function ProtectedRedirect() {
   return <Navigate to="/login" replace />;
 }
 
+import useFcmToken from "./hooks/useFcmToken";
+
 function App() {
   const { theme } = useContext(ThemeContext);
   const user = useSelector((state) => state.auth?.user);
 
+  // Khởi tạo FCM
+  useFcmToken();
+
   return (
+
     <SkeletonTheme
       baseColor={theme === "dark" ? "#3b4252" : "#e6e8eb"}
       highlightColor={theme === "dark" ? "#4c566a" : "#f5f7fa"}
