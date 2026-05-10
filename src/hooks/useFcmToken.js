@@ -25,7 +25,6 @@ const useFcmToken = () => {
                 headers: { Authorization: `Bearer ${user.accessToken}` },
               }
             );
-            console.log("🔔 FCM Token synced with backend");
           } catch (error) {
             console.error("❌ Failed to sync FCM Token:", error);
           }
@@ -39,7 +38,6 @@ const useFcmToken = () => {
   useEffect(() => {
     // Lắng nghe tin nhắn khi ứng dụng đang mở (Foreground)
     const unsubscribe = onMessage(messaging, (payload) => {
-      console.log("📱 Nhận thông báo (Foreground):", payload);
       // Ở đây bạn có thể hiển thị một Toast hoặc UI thông báo tùy chỉnh
     });
 

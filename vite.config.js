@@ -15,6 +15,6 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
-    allowedHosts: ['8712-42-119-85-187.ngrok-free.app'],
+    allowedHosts: ['bitter-ghosts-refuse.loca.lt'],
   },
 });

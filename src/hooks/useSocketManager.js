@@ -375,7 +375,6 @@ export function useSocketManager({ axiosContext, openContext }) {
 
         setCallDuration(0);
       } catch (error) {
-        console.error('❌ startCall error:', error);
         toast.error('❌ startCall error: ' + error.message);
       }
     },
