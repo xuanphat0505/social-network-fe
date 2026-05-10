@@ -46,6 +46,8 @@
   --notification-denied: #f56565; /* đỏ nhạt để nổi bật */
   --notification-denied-bg: rgba(245, 101, 101, 0.2);
   --notification-denied-bg-hover: rgba(245, 101, 101, 0.35);
+
+  --vh: 1vh;
 }
 
 :root[data-bs-theme="light"] {
@@ -88,6 +90,8 @@
   --notification-denied: #c53030; /* đỏ đậm cho text/icon */
   --notification-denied-bg: rgba(245, 101, 101, 0.15);
   --notification-denied-bg-hover: rgba(245, 101, 101, 0.25);
+
+  --vh: 1vh;
 }
 
 /* base */

@@ -42,6 +42,23 @@ function App() {
   // Khởi tạo FCM
   useFcmToken();
 
+  useEffect(() => {
+    // Hàm cập nhật biến CSS --vh để xử lý lỗi 100vh trên mobile
+    const setAppHeight = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty("--vh", `${vh}px`);
+    };
+
+    window.addEventListener("resize", setAppHeight);
+    window.addEventListener("orientationchange", setAppHeight);
+    setAppHeight(); // Khởi tạo giá trị ban đầu
+
+    return () => {
+      window.removeEventListener("resize", setAppHeight);
+      window.removeEventListener("orientationchange", setAppHeight);
+    };
+  }, []);
+
   return (
 
     <SkeletonTheme

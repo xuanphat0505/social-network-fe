@@ -18,8 +18,6 @@ const messaging = firebase.messaging();
 
 // Xử lý khi nhận tin nhắn background
 messaging.onBackgroundMessage((payload) => {
-  console.log('[firebase-messaging-sw.js] Received background message ', payload);
-
   const { data } = payload;
   
   // Nếu là lệnh hủy cuộc gọi
