@@ -65,6 +65,10 @@ function CallModal({ type = "video", isOpen, onClose }) {
   useEffect(() => {
     if (type === "video" && localVideoRef?.current && localStream) {
       localVideoRef.current.srcObject = localStream;
+      // iOS Safari yêu cầu gọi play() tường minh sau khi gán srcObject
+      localVideoRef.current.play().catch((err) => {
+        console.warn("Không thể tự động phát video cục bộ:", err);
+      });
     }
   }, [localVideoRef, localStream, isOpen, isVideoMinimized, type]);
 
@@ -74,6 +78,10 @@ function CallModal({ type = "video", isOpen, onClose }) {
   useEffect(() => {
     if (remoteVideoRef?.current && remoteStream) {
       remoteVideoRef.current.srcObject = remoteStream;
+      // iOS Safari yêu cầu gọi play() tường minh sau khi gán srcObject
+      remoteVideoRef.current.play().catch((err) => {
+        console.warn("Không thể tự động phát media từ xa:", err);
+      });
     }
   }, [remoteVideoRef, remoteStream, isOpen, isVideoMinimized]);
 
@@ -142,16 +150,12 @@ function CallModal({ type = "video", isOpen, onClose }) {
             >
               {/* Media Container */}
               <div className="remote-media-container absolute inset-0 z-0">
-                {type === "video" ? (
-                  <video
-                    ref={remoteVideoRef}
-                    autoPlay
-                    playsInline
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <audio ref={remoteVideoRef} autoPlay />
-                )}
+                <video
+                  ref={remoteVideoRef}
+                  autoPlay
+                  playsInline
+                  className="w-full h-full object-cover"
+                />
 
                 {/* Fallback Overlay or Audio Default Overlay */}
                 {(!remoteStream ||
@@ -256,6 +260,10 @@ function CallModal({ type = "video", isOpen, onClose }) {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
+                        // "Mở khóa" context media trên iOS trước khi accept
+                        if (remoteVideoRef?.current) {
+                          remoteVideoRef.current.play().catch(() => {});
+                        }
                         acceptCall();
                       }}
                       className="w-14 h-14 text-2xl flex items-center justify-center rounded-full bg-[#06d6a0] text-white hover:bg-[#05b688] transition-all shadow-xl hover:scale-110 active:scale-95 animate-bounce"

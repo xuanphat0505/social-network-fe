@@ -67,6 +67,7 @@
                     p {
                       color: var(--heading-color);
                       word-break: break-word;
+                      white-space: pre-wrap;
                     }
                     .chat-time {
                       justify-content: start;
@@ -148,6 +149,7 @@
                   p {
                     margin-bottom: 0;
                     word-break: break-word;
+                    white-space: pre-wrap;
                   }
                   .message-images {
                     display: flex;
@@ -295,8 +297,9 @@
         flex-wrap: wrap;
         align-items: center;
         gap: 4px;
-        padding: 0 0.5rem;
-        height: 53px;
+        padding: 8px 0.5rem;
+        min-height: 53px;
+        height: auto;
         border-radius: 0.4rem;
         background-color: var(--input-bg-color);
         max-height: 100px;
@@ -333,7 +336,8 @@
           }
         }
 
-        input {
+        input,
+        textarea {
           width: 100%;
           padding-left: 0.25rem;
           border-radius: 0.4rem;
@@ -342,7 +346,16 @@
           font-weight: 400;
           line-height: 1.5;
           outline: none;
+          border: none;
           flex: 1;
+        }
+        textarea {
+          resize: none;
+          height: 24px;
+          min-height: 24px;
+          overflow-y: hidden;
+          display: flex;
+          align-items: center;
         }
       }
     }
@@ -380,9 +393,10 @@
             &:hover {
               background-color: #6159cb !important;
             }
-            &.disabled {
-              cursor: not-allowed;
-              opacity: 0.75;
+            &:disabled, &.disabled {
+              cursor: not-allowed !important;
+              opacity: 0.5;
+              pointer-events: none;
               &:hover {
                 background-color: #7269ef !important;
               }

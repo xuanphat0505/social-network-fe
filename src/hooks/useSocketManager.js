@@ -47,12 +47,14 @@ export function useSocketManager({ axiosContext, openContext }) {
   const audioRef = useRef(null);
   const messageAudioRef = useRef(null);
   const callTimeoutRef = useRef(null);
+  const iceCandidatesQueueRef = useRef([]);
 
   const cleanupCall = useCallback(() => {
     peerRef.current?.close();
     localStreamRef.current?.getTracks().forEach((track) => track.stop());
     peerRef.current = null;
     localStreamRef.current = null;
+    iceCandidatesQueueRef.current = [];
 
     if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
     if (localVideoRef.current) localVideoRef.current.srcObject = null;
@@ -293,6 +295,18 @@ export function useSocketManager({ axiosContext, openContext }) {
     [setOpenAudioCallModal, setOpenVideoCallModal]
   );
 
+  const processQueuedCandidates = useCallback(async () => {
+    if (!peerRef.current || !peerRef.current.remoteDescription) return;
+    while (iceCandidatesQueueRef.current.length > 0) {
+      const candidate = iceCandidatesQueueRef.current.shift();
+      try {
+        await peerRef.current.addIceCandidate(new RTCIceCandidate(candidate));
+      } catch (error) {
+        console.warn("⚠️ Lỗi khi nạp ICE candidate từ hàng đợi:", error);
+      }
+    }
+  }, []);
+
   const handleAnswer = useCallback(async ({ signalData }) => {
     if (callTimeoutRef.current) {
       clearTimeout(callTimeoutRef.current);
@@ -300,18 +314,22 @@ export function useSocketManager({ axiosContext, openContext }) {
     }
     if (peerRef.current) {
       await peerRef.current.setRemoteDescription(new RTCSessionDescription(signalData));
+      await processQueuedCandidates();
     }
     setCallState('inCall');
     setCallDuration(0);
-  }, []);
+  }, [processQueuedCandidates]);
 
   const handleNewICE = useCallback(async ({ candidate }) => {
     try {
-      if (peerRef.current) {
+      if (peerRef.current && peerRef.current.remoteDescription) {
         await peerRef.current.addIceCandidate(new RTCIceCandidate(candidate));
+      } else {
+        // Nếu peer chưa khởi tạo hoặc chưa set remote description, đưa vào hàng đợi
+        iceCandidatesQueueRef.current.push(candidate);
       }
     } catch (error) {
-      return toast.error('❌ Error adding ICE candidate:', error);
+      console.error('❌ Error adding ICE candidate:', error);
     }
   }, []);
 
@@ -328,7 +346,10 @@ export function useSocketManager({ axiosContext, openContext }) {
         const stream = await navigator.mediaDevices.getUserMedia({ video: isVideo, audio: true });
         localStreamRef.current = stream;
         setLocalStream(stream);
-        if (localVideoRef.current) localVideoRef.current.srcObject = stream;
+        if (localVideoRef.current) {
+          localVideoRef.current.srcObject = stream;
+          localVideoRef.current.play().catch(() => {});
+        }
 
         const peer = new RTCPeerConnection({
           iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
@@ -349,7 +370,10 @@ export function useSocketManager({ axiosContext, openContext }) {
           const remote = event.streams[0];
           remoteStreamRef.current = remote;
           setRemoteStream(remote);
-          if (remoteVideoRef.current) remoteVideoRef.current.srcObject = remote;
+          if (remoteVideoRef.current) {
+            remoteVideoRef.current.srcObject = remote;
+            remoteVideoRef.current.play().catch(() => {});
+          }
         };
 
         const offer = await peer.createOffer();
@@ -389,7 +413,10 @@ export function useSocketManager({ axiosContext, openContext }) {
       const stream = await navigator.mediaDevices.getUserMedia({ video: isVideo, audio: true });
       localStreamRef.current = stream;
       setLocalStream(stream);
-      if (localVideoRef.current) localVideoRef.current.srcObject = stream;
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = stream;
+        localVideoRef.current.play().catch(() => {});
+      }
 
       const peer = new RTCPeerConnection({
         iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
@@ -410,10 +437,14 @@ export function useSocketManager({ axiosContext, openContext }) {
         const remote = event.streams[0];
         remoteStreamRef.current = remote;
         setRemoteStream(remote);
-        if (remoteVideoRef.current) remoteVideoRef.current.srcObject = remote;
+        if (remoteVideoRef.current) {
+          remoteVideoRef.current.srcObject = remote;
+          remoteVideoRef.current.play().catch(() => {});
+        }
       };
 
       await peer.setRemoteDescription(new RTCSessionDescription(signalData));
+      await processQueuedCandidates();
       const answer = await peer.createAnswer();
       await peer.setLocalDescription(answer);
       socket.current.emit('answerCall', {
@@ -428,7 +459,7 @@ export function useSocketManager({ axiosContext, openContext }) {
       console.error('❌ acceptCall error:', error);
       toast.error('❌ acceptCall error: ' + error.message);
     }
-  }, [incomingCall]);
+  }, [incomingCall, processQueuedCandidates]);
 
   const endCall = useCallback(() => {
     const otherId = incomingCall ? incomingCall.from._id : partnerId;

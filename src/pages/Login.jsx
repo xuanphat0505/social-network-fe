@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  RiUser2Line,
+  RiMailLine,
   RiLock2Line,
   RiEyeLine,
   RiEyeOffLine,
@@ -120,12 +120,12 @@ function Login() {
               <form onSubmit={handleSubmit}>
                 <div className="mb-4">
                   <div className="block text-left mb-2">
-                    <label>Username</label>
+                    <label>Email</label>
                   </div>
                   <div className="form-input">
                     <span>
                       <i>
-                        <RiUser2Line />
+                        <RiMailLine />
                       </i>
                     </span>
                     <input

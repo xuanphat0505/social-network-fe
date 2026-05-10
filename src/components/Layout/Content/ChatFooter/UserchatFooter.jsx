@@ -37,12 +37,13 @@ function UserchatFooter({ receiverId }) {
 
   const fileInputRef = useRef();
   const typingTimeoutRef = useRef();
+  const textareaRef = useRef();
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
 
     if (!content.trim() && selectedFiles.length === 0) {
-      return toast.error("Vui lòng nhập tin nhắn hoặc chọn file");
+      return; // Bỏ qua âm thầm (Silent Return) chuẩn UX chat app
     }
 
     const tempId = `temp-${Date.now()}`;
@@ -177,6 +178,16 @@ function UserchatFooter({ receiverId }) {
     return () => clearTimeout(timeoutId); // cleanup khi deps thay đổi
   }, [content, selectedFiles]);
 
+  // Tự động điều chỉnh chiều cao cho textarea khi nội dung thay đổi
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "24px"; // Reset về độ cao mặc định 1 dòng
+      const scrollHeight = textareaRef.current.scrollHeight;
+      // Cho phép textarea tự giãn nở dựa theo nội dung
+      textareaRef.current.style.height = scrollHeight + "px";
+    }
+  }, [content]);
+
   return (
     <div className="user-chat_footer w-full p-6 border-t-[1px] border-border-color">
       <form className="w-full flex items-center flex-wrap">
@@ -225,7 +236,9 @@ function UserchatFooter({ receiverId }) {
                 ))}
               </div>
             )}
-            <input
+            <textarea
+              ref={textareaRef}
+              rows={1}
               className={`${
                 user.blockedUsers.includes(receiverId) ||
                 blockedBy[receiverId] ||
@@ -235,7 +248,6 @@ function UserchatFooter({ receiverId }) {
               }`}
               onChange={handleChange}
               value={content}
-              type="text"
               placeholder="Aa..."
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -299,7 +311,17 @@ function UserchatFooter({ receiverId }) {
             </Tippy>
 
             <li>
-              <Button type="primary" onClick={handleSendMessage} className="send-btn">
+              <Button
+                type="primary"
+                onClick={handleSendMessage}
+                className="send-btn"
+                disabled={
+                  (!content.trim() && selectedFiles.length === 0) ||
+                  user.blockedUsers.includes(receiverId) ||
+                  blockedBy[receiverId] ||
+                  isBlockedByReceiver
+                }
+              >
                 {isLoading ? (
                   <Loader />
                 ) : (
